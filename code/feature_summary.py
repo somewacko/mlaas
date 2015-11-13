@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import os
-path = './features/'  # remove the trailing '\'
+path = '../features/'  # remove the trailing '\'
 avg_features=[]
 for dir_entry in os.listdir(path):
     dir_entry_path = os.path.join(path, dir_entry)
