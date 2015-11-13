@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import os
-path = '../features/'  # remove the trailing '\'
+path = '../data/features/'  # remove the trailing '\'
 avg_features=[]
 for dir_entry in os.listdir(path):
     dir_entry_path = os.path.join(path, dir_entry)
@@ -33,4 +33,21 @@ for dir_entry in os.listdir(path):
 		print dir_entry_path 
 		avg_features.append(avg_feat)
 		f.close()
+#dump to file in csv format
+#chi1,chi2,hbonds,rms,state
+#1 FV per line
+f = open('../data/avg_features'+str(len(avg_features))+'.txt','w')
+states= open('../data/states.txt','r')
+for each in avg_features:
+	fv=''
+	#can choose key inputs here 
+	#if only subset of features are required
+	for v in each.values():
+		for val in v:
+			fv=fv+str(val)+','
+	fv=fv+states.readline().strip().split()[1]
+	fv=fv+'\n'
+	f.write(fv)
+f.close()
+states.close()
 print len(avg_features)
