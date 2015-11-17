@@ -5,7 +5,7 @@
 
     <groupId>org.mlaas</groupId>
     <artifactId>mlaas</artifactId>
-    <version>0.4-rc0-SNAPSHOT</version>
+    <version>0.1-mlaas-SNAPSHOT</version>
 
     <name>Machine Learning as a Service</name>
     <description>Analysis system for exploring large datasets.</description>
@@ -137,6 +137,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.1</version>
                 <configuration>
                     <source>1.7</source>
                     <target>1.7</target>
