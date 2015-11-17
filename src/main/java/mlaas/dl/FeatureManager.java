@@ -10,7 +10,7 @@ public class FeatureManager {
 
 
 
-	public void getFeatures(ArrayList<Data> data, ArrayList<Features> features)
+	public void getFeatures(ArrayList<DataSample> data, ArrayList<DataFeature> features)
 	{
 		
 	}
