@@ -9,6 +9,7 @@ import org.canova.api.split.FileSplit;
 import org.deeplearning4j.datasets.canova.RecordReaderDataSetIterator;
 import org.deeplearning4j.datasets.iterator.DataSetIterator;
 import org.deeplearning4j.eval.Evaluation;
+import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
 import org.deeplearning4j.nn.conf.layers.DenseLayer;
@@ -47,9 +48,9 @@ public class BptiSparkExample {
         final int numFeat = 970;
         int outputNum = 5;
         int numSamples = 300;
-        int iterations = 10;
+        int iterations = 100;
         int seed = 123;
-        int listenerFreq = iterations/5;
+        int listenerFreq = iterations/20;
         int batchSize = 10;
         SplitTestAndTrain trainTest;
 
@@ -59,28 +60,29 @@ public class BptiSparkExample {
 
         //log.info("Build model....");
         JavaSparkContext sc = new JavaSparkContext(sparkConf);
+        String activation = "tanh";
         MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
                 .seed(seed).batchSize(batchSize)
                 .iterations(iterations)
                 .constrainGradientToUnitNorm(true).useDropConnect(true)
-                .learningRate(1e-1)
+                //.learningRate(1e-1)
                 .l1(0.3).regularization(true).l2(1e-3)
-                .constrainGradientToUnitNorm(true)
+                .constrainGradientToUnitNorm(true).optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
                 .list(5)
                 .layer(0, new DenseLayer.Builder().nIn(numFeat).nOut(750)
-                        .activation("relu").dropOut(0.5)
+                        .activation(activation).dropOut(0.5)
                         .weightInit(WeightInit.XAVIER)
                         .build())
                 .layer(1, new DenseLayer.Builder().nIn(750).nOut(500)
-                        .activation("relu").dropOut(0.5)
+                        .activation(activation).dropOut(0.5)
                         .weightInit(WeightInit.XAVIER)
                         .build())
                 .layer(2, new DenseLayer.Builder().nIn(500).nOut(300)
-                        .activation("relu").dropOut(0.5)
+                        .activation(activation).dropOut(0.5)
                         .weightInit(WeightInit.XAVIER)
                         .build())
                 .layer(3, new DenseLayer.Builder().nIn(300).nOut(200)
-                        .activation("relu")
+                        .activation(activation)
                         .weightInit(WeightInit.XAVIER)
                         .build())
                 .layer(4, new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
@@ -98,10 +100,10 @@ public class BptiSparkExample {
 
         DataSetIterator iter = new RecordReaderDataSetIterator(reader, numSamples,numFeat,outputNum);
         DataSet next = iter.next();
-        next.normalizeZeroMeanZeroUnitVariance();
+        //next.normalizeZeroMeanZeroUnitVariance();
         next.shuffle();
         //log.info("Num of examples: " + String.valueOf(next.numExamples()));
-        trainTest = next.splitTestAndTrain(0.7);
+        trainTest = next.splitTestAndTrain(0.8);
 
         SparkDl4jMultiLayer master = new SparkDl4jMultiLayer(sc,conf);
         //number of partitions should be partitioned by batch size
@@ -121,7 +123,7 @@ public class BptiSparkExample {
         Evaluation eval = new Evaluation(outputNum);
 
         log.info("Predictions---");
-        INDArray predict2 = model.output(trainTest.getTest().getFeatureMatrix());
+        INDArray predict2 = network2.output(trainTest.getTest().getFeatureMatrix());
 
         eval.eval(trainTest.getTest().getLabels(), predict2);
 

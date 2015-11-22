@@ -44,7 +44,7 @@ public class BptiExample {
         int outputNum = 5;
         //int numSamples =1000;
         //int batchSize = 20;
-        int iterations = 10;
+        int iterations = 1000;
         int seed = 123;
         int listenerFreq = iterations/5;
         //int splitTrainNum = (int) (batchSize*.8);
@@ -74,20 +74,21 @@ public class BptiExample {
                         .nIn(100).nOut(outputNum).build())
                 .pretrain(true).backprop(true)
                 .build(); */
+        String activ = "tanh";
         MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
                 .seed(seed)
                 .iterations(iterations)
                 .constrainGradientToUnitNorm(true).useDropConnect(true)
-                .learningRate(1e-1)
+                //.learningRate(1e-1)
                 .l1(0.3).regularization(true).l2(1e-3)
-                .constrainGradientToUnitNorm(true)
+                .constrainGradientToUnitNorm(true).optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
                 .list(3)
                 .layer(0, new DenseLayer.Builder().nIn(numFeat).nOut(300)
-                        .activation("relu").dropOut(0.5)
+                        .activation(activ).dropOut(0.5)
                         .weightInit(WeightInit.XAVIER)
                         .build())
                 .layer(1, new DenseLayer.Builder().nIn(300).nOut(200)
-                        .activation("relu")
+                        .activation(activ)
                         .weightInit(WeightInit.XAVIER)
                         .build())
                 .layer(2, new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
