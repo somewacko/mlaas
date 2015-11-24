@@ -56,7 +56,7 @@ public class BptiSparkExample {
 
         //Load data..
         RecordReader reader = new CSVRecordReader(0, ",");
-        reader.initialize(new FileSplit(new File("/Users/Aileme/git/mlaas/data/avg_features300.txt")));
+        reader.initialize(new FileSplit(new File("/Users/Aileme/git/x/data/avg_features300.txt")));
 
         //log.info("Build model....");
         JavaSparkContext sc = new JavaSparkContext(sparkConf);
@@ -107,7 +107,7 @@ public class BptiSparkExample {
 
         SparkDl4jMultiLayer master = new SparkDl4jMultiLayer(sc,conf);
         //number of partitions should be partitioned by batch size
-        //JavaRDD<String> lines = sc.textFile("/Users/Aileme/git/mlaas-bpti/src/main/resources/avg_features20.txt",60000 / conf.getConf(0).getBatchSize());
+        //JavaRDD<String> lines = sc.textFile("/Users/Aileme/git/x-bpti/src/main/resources/avg_features20.txt",60000 / conf.getConf(0).getBatchSize());
         JavaRDD<DataSet> data = sc.parallelize(trainTest.getTrain().asList(), numSamples / conf.getConf(0).getBatchSize());
 
         //Train

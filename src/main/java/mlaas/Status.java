@@ -1,4 +1,4 @@
-package mlaas.dl;
+package mlaas;
 
 public class Status {
 

@@ -1,4 +1,4 @@
-package mlaas.dl.bpti;
+package mlaas.bpti;
 
 /**
  * Different features available in the BPTI data set.

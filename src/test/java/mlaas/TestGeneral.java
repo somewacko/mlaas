@@ -1,4 +1,4 @@
-package mlaas.dl;
+package mlaas;
 
 import static org.junit.Assert.*;
 

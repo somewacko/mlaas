@@ -1,4 +1,4 @@
-package mlaas.dl;
+package mlaas;
 
 /**
  * Different data sets available for analysis.

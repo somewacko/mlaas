@@ -1,4 +1,4 @@
-package mlaas.dl;
+package mlaas;
 
 /**
  * Interface for implementing features in different data sets.

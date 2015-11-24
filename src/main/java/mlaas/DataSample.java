@@ -1,4 +1,4 @@
-package mlaas.dl;
+package mlaas;
 
 /**
  * Interface for implementing samples in different data sets.
