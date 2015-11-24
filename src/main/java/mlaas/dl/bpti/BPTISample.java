@@ -1,5 +1,7 @@
 package mlaas.dl.bpti;
 
+import mlaas.dl.DataSet;
+
 /**
  * Samples available in the BPTI data set.
  */
@@ -30,7 +32,8 @@ public class BPTISample implements mlaas.dl.DataSample {
 	}
 
 	@Override
-	public int getId() {
-		return this.index;
-	}
+	public int getId() { return this.index; }
+
+	@Override
+	public mlaas.dl.DataSet getDataSet() { return mlaas.dl.DataSet.BPTI; }
 }

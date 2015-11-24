@@ -17,4 +17,10 @@ public interface DataSample {
 	 * @return The unique ID for this sample.
 	 */
 	int getId();
+
+	/**
+	 * The data set which this sample is derived from.
+	 * @return The associated data set.
+	 */
+	DataSet getDataSet();
 }

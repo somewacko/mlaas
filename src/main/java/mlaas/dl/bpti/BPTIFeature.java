@@ -21,7 +21,8 @@ public class BPTIFeature implements mlaas.dl.DataFeature {
 	}
 
 	@Override
-	public int getId() {
-		return this.type.ordinal();
-	}
+	public int getId() { return this.type.ordinal(); }
+
+	@Override
+	public mlaas.dl.DataSet getDataSet() { return mlaas.dl.DataSet.BPTI; }
 }
