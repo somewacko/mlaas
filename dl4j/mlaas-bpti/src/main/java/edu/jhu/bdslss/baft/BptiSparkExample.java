@@ -47,7 +47,7 @@ public class BptiSparkExample {
         Nd4j.ENFORCE_NUMERICAL_STABILITY = true;
         final int numFeat = 970;
         int outputNum = 5;
-        int numSamples = 300;
+        int numSamples = 1000;
         int iterations = 100;
         int seed = 123;
         int listenerFreq = iterations/20;
@@ -56,7 +56,7 @@ public class BptiSparkExample {
 
         //Load data..
         RecordReader reader = new CSVRecordReader(0, ",");
-        reader.initialize(new FileSplit(new File("/Users/Aileme/git/mlaas/data/avg_features300.txt")));
+        reader.initialize(new FileSplit(new File("/Users/bimangujral/Documents/Sem3/BigData/Project/Code/mlaas/data/avg_features1000.txt")));
 
         //log.info("Build model....");
         JavaSparkContext sc = new JavaSparkContext(sparkConf);

@@ -44,7 +44,7 @@ public class BptiExample {
         int outputNum = 5;
         //int numSamples =1000;
         //int batchSize = 20;
-        int iterations = 1000;
+        int iterations = 100;
         int seed = 123;
         int listenerFreq = iterations/5;
         //int splitTrainNum = (int) (batchSize*.8);
