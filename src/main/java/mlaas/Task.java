@@ -1,5 +1,6 @@
 package mlaas;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -20,13 +21,15 @@ abstract public class Task {
 
 	private Job endJob;
 
+	public Boolean isValid = false;
+
 
 	/**
 	 * Constructor for a Task, given a set of jobs.
-	 * @param jobs
+	 * @param jobs The jobs to create a task from.
 	 */
-	public Task(Set<Job> jobs) {
-		this.jobs = jobs;
+	public Task(Collection<Job> jobs) {
+		this.jobs = new HashSet<>(jobs);
 
 		// Find the common work between all jobs by finding the intersection of all of their work.
 		for (Job job : this.jobs) {
@@ -47,6 +50,19 @@ abstract public class Task {
 
 
 	/**
+	 * Constructor for a Task to create a copy of another task.
+	 * @param task The task to create a copy from.
+	 */
+	public Task(Task task) {
+		this.jobs = new HashSet<>(task.getJobs());
+		this.work = new HashSet<>(task.getWork());
+		this.endJob = task.getEndJob();
+		this.lastTask = task.getLastTask();
+		this.nextTasks = new HashSet<>(task.getNextTasks());
+	}
+
+
+	/**
 	 * Extracts the appropriate unit of work from a given job to define this task. For example, if this was a task
 	 * based on common features, then the extracted work would be the features for the job.
 	 * @param job
@@ -55,11 +71,19 @@ abstract public class Task {
 	abstract protected Set<DataUnit> extractWork(Job job);
 
 
+	/**
+	 * Removes work from the task's set of work.
+	 * @param workToRemove
+	 */
+	public void removeWork(Set<DataUnit> workToRemove) {
+		this.work.removeAll(workToRemove);
+	}
+
 	// Getters and setters
 
-	public void setLastTask(Task task) {
-		this.lastTask = task;
-	}
+	public Set<Job> getJobs() { return this.jobs; }
+
+	public void setLastTask(Task task) { this.lastTask = task; }
 
 	public Task getLastTask() {
 		return this.lastTask;
