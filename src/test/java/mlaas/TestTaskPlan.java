@@ -102,49 +102,7 @@ public class TestTaskPlan {
 		return true;
 	}
 
-	private int countTasks(Task task) {
 
-		int count = 1;
-
-		for (Task nextTask : task.getNextTasks())
-			count += this.countTasks(nextTask);
-
-		return count;
-	}
-
-	private int countWork(Task task) {
-
-		int count = task.getWork().size();
-
-		for (Task nextTask : task.getNextTasks())
-			count += this.countWork(nextTask);
-
-		return count;
-	}
-
-	private void printStats(TaskPlan taskPlan, JobGroup jobGroup) {
-
-		int taskCount = 0;
-		for (Task task : taskPlan.getStartingTasks())
-			taskCount += this.countTasks(task);
-		System.out.printf("Num. tasks: %d\n", taskCount);
-
-		int workCount = 0;
-		for (Task task : taskPlan.getStartingTasks())
-			workCount += this.countWork(task);
-		System.out.printf("Num. work: %d\n", workCount);
-
-		int baseWorkCount = 0;
-		for (Job job : jobGroup.getJobs()) {
-			if (jobGroup.getType() == JobGroupType.SharedFeatures)
-				baseWorkCount += job.getFeatures().size();
-			else
-				baseWorkCount += job.getSamples().size();
-		}
-		System.out.printf("Base work: %d\n", baseWorkCount);
-
-		System.out.printf("Doing %5.2f%% of work\n", 100*(workCount/(float)baseWorkCount));
-	}
 
 	@Test
 	public void testDuplicateJobs() {
@@ -169,7 +127,6 @@ public class TestTaskPlan {
 		TaskPlan taskPlan = new TaskPlan(jobGroup);
 
 		//printTaskPlan(taskPlan);
-		//printStats(taskPlan, jobGroup);
 
 		assertTrue( verifyTaskPlan(taskPlan, jobGroup) );
 	}
@@ -207,7 +164,6 @@ public class TestTaskPlan {
 		TaskPlan taskPlan = new TaskPlan(jobGroup);
 
 		//printTaskPlan(taskPlan);
-		//printStats(taskPlan, jobGroup);
 
 		assertTrue( verifyTaskPlan(taskPlan, jobGroup) );
 	}
@@ -245,7 +201,6 @@ public class TestTaskPlan {
 		TaskPlan taskPlan = new TaskPlan(jobGroup);
 
 		//printTaskPlan(taskPlan);
-		//printStats(taskPlan, jobGroup);
 
 		assertTrue( verifyTaskPlan(taskPlan, jobGroup) );
 	}
@@ -289,7 +244,6 @@ public class TestTaskPlan {
 		TaskPlan taskPlan = new TaskPlan(jobGroup);
 
 		//printTaskPlan(taskPlan);
-		//printStats(taskPlan, jobGroup);
 
 		assertTrue( verifyTaskPlan(taskPlan, jobGroup) );
 	}
@@ -354,7 +308,6 @@ public class TestTaskPlan {
 		TaskPlan taskPlan = new TaskPlan(jobGroup);
 
 		//printTaskPlan(taskPlan);
-		//printStats(taskPlan, jobGroup);
 
 		assertTrue( verifyTaskPlan(taskPlan, jobGroup) );
 	}
@@ -363,7 +316,8 @@ public class TestTaskPlan {
 	public void testLargeGroup() {
 
 		final int numJobs = 10;
-		final int numWork = 100;
+		final int numWork = 1000;
+		final double variance = 50;
 
 		final Random rand = new Random();
 
@@ -375,7 +329,8 @@ public class TestTaskPlan {
 			for (int i = 0; i < numJobs; i++) {
 				Set<DataSample> samples = new HashSet<DataSample>(){{
 					for (int j = 0; j < numWork; j++) {
-						add(new TestSample(rand.nextInt(numWork/2)));
+						double gaussian = variance * rand.nextGaussian();
+						add(new TestSample( (int)Math.round(gaussian) ));
 					}
 				}};
 				add(new Job(DataSet.None, samples, commonFeatures));
@@ -384,8 +339,6 @@ public class TestTaskPlan {
 
 		JobGroup jobGroup = new JobGroup(jobs, JobGroupType.SharedSamples);
 		TaskPlan taskPlan = new TaskPlan(jobGroup);
-
-		// printStats(taskPlan, jobGroup);
 
 		assertTrue( verifyTaskPlan(taskPlan, jobGroup) );
 	}
