@@ -16,12 +16,8 @@ public class TaskPlan {
 	 * Constructor for TaskPlan with a given JobGroup.
 	 * @param jobGroup The job group to create a task plan from.
  	 */
-	public TaskPlan(JobGroup jobGroup) throws RuntimeException {
-
-		if (jobGroup.getJobs().size() <= 8)
-			this.generateTaskPlan(jobGroup);
-		else
-			throw new RuntimeException("Task plans cannot be run with more than 8 jobs.");
+	public TaskPlan(JobGroup jobGroup) {
+		this.generateTaskPlan(jobGroup);
 	}
 
 
@@ -31,12 +27,45 @@ public class TaskPlan {
 	 */
 	private void generateTaskPlan(final JobGroup jobGroup) throws RuntimeException {
 
+		// Set up helper classes
+
+		// Class to represent a node in the task plan - contains the task associated for the node and all of the
+		// remaining work that still has to be done for that node.
+		class TaskNode {
+			Task task;
+			Map<Job, List<Task>> remainingTasks;
+			int distance = Integer.MAX_VALUE;
+
+			public TaskNode(Task task, Map<Job, List<Task>> remainingTasks) {
+				this.task = task;
+				this.remainingTasks = remainingTasks;
+
+				for (List<Task> list : this.remainingTasks.values())
+					this.distance = Math.min(list.size(), this.distance);
+			}
+		}
+
+		// Comparator for priority queue for best-first search, using the distance from a terminating node as the
+		// primary heuristic.
+		class TaskNodeComparator implements Comparator<TaskNode> {
+			@Override
+			public int compare(TaskNode x, TaskNode y) {
+				if (x.distance < y.distance)
+					return -1;
+				else if (x.distance > y.distance)
+					return 1;
+				else
+					return 0;
+			}
+		}
+
+		// Get all tasks with common work
+
 		List<Task> tasks = this.findCommonTasks(jobGroup);
 
-		// Set up breadth-first search
+		// Set up for best-first search
 
-		Queue<Task> taskQueue = new LinkedList<>();
-		Queue<Map<Job, List<Task>>> remainingTasksQueue = new LinkedList<>();
+		PriorityQueue<TaskNode> queue = new PriorityQueue<>(new TaskNodeComparator());
 
 		Map<Job, Task> terminatingTasks = new HashMap<Job, Task>(){{
 			for (Job job : jobGroup.getJobs())
@@ -53,10 +82,6 @@ public class TaskPlan {
 
 			Map<Job, List<Task>> remainingTasks = new HashMap<>();
 
-			startingTasks.add(task);
-			taskQueue.add(task);
-			remainingTasksQueue.add(remainingTasks);
-
 			for (Job job : task.getJobs()) {
 
 				remainingTasks.put(job, new LinkedList<Task>());
@@ -68,15 +93,21 @@ public class TaskPlan {
 				jobsLeft.remove(job);
 			}
 
+			queue.add(new TaskNode(task, remainingTasks));
+			startingTasks.add(task);
+
 			if (jobsLeft.isEmpty())
 				break;
 		}
 
-		// Perform BFS
+		// Perform best-first search
 
-		while (!taskQueue.isEmpty()) {
-			Task task = taskQueue.remove();
-			Map<Job, List<Task>> remainingTasks = remainingTasksQueue.remove();
+		while (!queue.isEmpty()) {
+
+			TaskNode node = queue.remove();
+
+			Task task = node.task;
+			Map<Job, List<Task>> remainingTasks = node.remainingTasks;
 
 			if (task.getEndJob() != null) {
 				if (terminatingTasks.get(task.getEndJob()) == null) {
@@ -122,8 +153,7 @@ public class TaskPlan {
 
 						// Add to queues
 
-						taskQueue.add(newTask);
-						remainingTasksQueue.add(newRemainingTasks);
+						queue.add(new TaskNode(newTask, newRemainingTasks));
 					}
 				}
 			}
@@ -183,24 +213,50 @@ public class TaskPlan {
 	 * Finds the set of tasks with common work within a job group, ordered from tasks that satisfy the most number of
 	 * jobs to tasks that satisfy the least.
 	 *
-	 * TODO: Optimize this so it's not O(2^N) (from having to find the power set of jobs)
-	 *
 	 * @param jobGroup
 	 * @return A list of tasks with common work.
 	 */
 	private List<Task> findCommonTasks(JobGroup jobGroup) {
 
-		final List<Task> tasks = new LinkedList<Task>();
+		final List<Task> tasks = new ArrayList<>();
 
-		// Create tasks from all combinations of jobs that have common work
+		Set<DataUnit> allWork = jobGroup.allWork();
 
-		for (List<Job> ps : PowerSet.findPowerSet(jobGroup.getJobs())) {
+		List<Job> relatedJobs = new LinkedList<>();
 
-			Task newTask = TaskFactory.createTask(ps, jobGroup.getType());
+		// Go through each work present in the group
+		for (DataUnit work : allWork) {
 
-			if (newTask.getWork().size() > 0)
-				tasks.add(newTask);
+			relatedJobs.clear();
+
+			// Find the jobs which have this work in common
+			for (Job job : jobGroup.getJobs()) {
+				if (jobGroup.extractWork(job).contains(work))
+					relatedJobs.add(job);
+			}
+
+			// Add this job group if there are more than one jobs associated with it (tasks with only one job will
+			// be added later)
+			if (relatedJobs.size() > 1)
+				tasks.add( TaskFactory.createTask(relatedJobs, jobGroup.getType()) );
 		}
+		// Add tasks which only have one job associated with them
+		for (Job job : jobGroup.getJobs()) {
+			tasks.add( TaskFactory.createTask(Arrays.asList(job), jobGroup.getType()) );
+		}
+
+		// Sort tasks from tasks with the most to least number of associated jobs
+		Collections.sort(tasks, new Comparator<Task>() {
+			@Override
+			public int compare(Task o1, Task o2) {
+				if (o1.getJobs().size() > o2.getJobs().size())
+					return -1;
+				else if (o1.getJobs().size() < o2.getJobs().size())
+					return  1;
+				else
+					return 0;
+			}
+		});
 
 		// Starting from the top, remove all work in the current task from smaller-sized tasks
 

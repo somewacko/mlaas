@@ -23,7 +23,6 @@ abstract public class Task {
 
 	public Boolean isValid = false;
 
-
 	/**
 	 * Constructor for a Task, given a set of jobs.
 	 * @param jobs The jobs to create a task from.
@@ -48,7 +47,6 @@ abstract public class Task {
 		this.nextTasks = new HashSet<Task>();
 	}
 
-
 	/**
 	 * Constructor for a Task to create a copy of another task.
 	 * @param task The task to create a copy from.
@@ -61,7 +59,6 @@ abstract public class Task {
 		this.nextTasks = new HashSet<>(task.getNextTasks());
 	}
 
-
 	/**
 	 * Extracts the appropriate unit of work from a given job to define this task. For example, if this was a task
 	 * based on common features, then the extracted work would be the features for the job.
@@ -70,7 +67,6 @@ abstract public class Task {
 	 */
 	abstract protected Set<DataUnit> extractWork(Job job);
 
-
 	/**
 	 * Removes work from the task's set of work.
 	 * @param workToRemove
@@ -78,6 +74,7 @@ abstract public class Task {
 	public void removeWork(Set<DataUnit> workToRemove) {
 		this.work.removeAll(workToRemove);
 	}
+
 
 	// Getters and setters
 
