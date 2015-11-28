@@ -1,8 +1,7 @@
 package mlaas;
 
-import mlaas.bpti.BPTIFeature;
-import mlaas.bpti.BPTISample;
-import mlaas.bpti.BPTIFeatureType;
+import mlaas.bpti.*;
+import mlaas.generic.*;
 
 import java.util.*;
 import org.junit.*;
@@ -151,22 +150,19 @@ public class TestTaskPlan {
 	public void testDuplicateJobs() {
 
 		final List<DataFeature> commonFeatures = new ArrayList<DataFeature>(){{
-			add(new BPTIFeature(BPTIFeatureType.Chi1));
-			add(new BPTIFeature(BPTIFeatureType.Chi2));
-			add(new BPTIFeature(BPTIFeatureType.HBonds));
-			add(new BPTIFeature(BPTIFeatureType.RMSD));
+			add(new TestFeature(0));
 		}};
 
 		final List<DataSample> samples = new ArrayList<DataSample>(){{
-			add(new BPTISample(1));
-			add(new BPTISample(2));
-			add(new BPTISample(3));
+			add(new TestSample(1));
+			add(new TestSample(2));
+			add(new TestSample(3));
 		}};
 
 		List<Job> jobs = new ArrayList<Job>(){{
-			add(new Job(DataSet.BPTI, samples, commonFeatures));
-			add(new Job(DataSet.BPTI, samples, commonFeatures));
-			add(new Job(DataSet.BPTI, samples, commonFeatures));
+			add(new Job(DataSet.None, samples, commonFeatures));
+			add(new Job(DataSet.None, samples, commonFeatures));
+			add(new Job(DataSet.None, samples, commonFeatures));
 		}};
 
 		JobGroup jobGroup = new JobGroup(jobs, JobGroupType.SharedSamples);
@@ -182,32 +178,29 @@ public class TestTaskPlan {
 	public void testUnrelatedJobs() {
 
 		final List<DataFeature> commonFeatures = new ArrayList<DataFeature>(){{
-			add(new BPTIFeature(BPTIFeatureType.Chi1));
-			add(new BPTIFeature(BPTIFeatureType.Chi2));
-			add(new BPTIFeature(BPTIFeatureType.HBonds));
-			add(new BPTIFeature(BPTIFeatureType.RMSD));
+			add(new TestFeature(0));
 		}};
 
 		final List<DataSample> samples1 = new ArrayList<DataSample>(){{
-			add(new BPTISample(1));
-			add(new BPTISample(2));
-			add(new BPTISample(3));
+			add(new TestSample(1));
+			add(new TestSample(2));
+			add(new TestSample(3));
 		}};
 		final List<DataSample> samples2 = new ArrayList<DataSample>(){{
-			add(new BPTISample(4));
-			add(new BPTISample(5));
-			add(new BPTISample(6));
+			add(new TestSample(4));
+			add(new TestSample(5));
+			add(new TestSample(6));
 		}};
 		final List<DataSample> samples3 = new ArrayList<DataSample>(){{
-			add(new BPTISample(7));
-			add(new BPTISample(8));
-			add(new BPTISample(9));
+			add(new TestSample(7));
+			add(new TestSample(8));
+			add(new TestSample(9));
 		}};
 
 		List<Job> jobs = new ArrayList<Job>(){{
-			add(new Job(DataSet.BPTI, samples1, commonFeatures));
-			add(new Job(DataSet.BPTI, samples2, commonFeatures));
-			add(new Job(DataSet.BPTI, samples3, commonFeatures));
+			add(new Job(DataSet.None, samples1, commonFeatures));
+			add(new Job(DataSet.None, samples2, commonFeatures));
+			add(new Job(DataSet.None, samples3, commonFeatures));
 		}};
 
 		JobGroup jobGroup = new JobGroup(jobs, JobGroupType.SharedSamples);
@@ -223,32 +216,29 @@ public class TestTaskPlan {
 	public void testSimpleJobs() {
 
 		final List<DataFeature> commonFeatures = new ArrayList<DataFeature>(){{
-			add(new BPTIFeature(BPTIFeatureType.Chi1));
-			add(new BPTIFeature(BPTIFeatureType.Chi2));
-			add(new BPTIFeature(BPTIFeatureType.HBonds));
-			add(new BPTIFeature(BPTIFeatureType.RMSD));
+			add(new TestFeature(0));
 		}};
 
 		final List<DataSample> samples1 = new ArrayList<DataSample>(){{
-			add(new BPTISample(1));
-			add(new BPTISample(2));
-			add(new BPTISample(3));
+			add(new TestSample(1));
+			add(new TestSample(2));
+			add(new TestSample(3));
 		}};
 		final List<DataSample> samples2 = new ArrayList<DataSample>(){{
-			add(new BPTISample(2));
-			add(new BPTISample(3));
-			add(new BPTISample(4));
+			add(new TestSample(2));
+			add(new TestSample(3));
+			add(new TestSample(4));
 		}};
 		final List<DataSample> samples3 = new ArrayList<DataSample>(){{
-			add(new BPTISample(3));
-			add(new BPTISample(4));
-			add(new BPTISample(5));
+			add(new TestSample(3));
+			add(new TestSample(4));
+			add(new TestSample(5));
 		}};
 
 		List<Job> jobs = new ArrayList<Job>(){{
-			add(new Job(DataSet.BPTI, samples1, commonFeatures));
-			add(new Job(DataSet.BPTI, samples2, commonFeatures));
-			add(new Job(DataSet.BPTI, samples3, commonFeatures));
+			add(new Job(DataSet.None, samples1, commonFeatures));
+			add(new Job(DataSet.None, samples2, commonFeatures));
+			add(new Job(DataSet.None, samples3, commonFeatures));
 		}};
 
 		JobGroup jobGroup = new JobGroup(jobs, JobGroupType.SharedSamples);
@@ -264,38 +254,35 @@ public class TestTaskPlan {
 	public void testComplexJobs() {
 
 		final List<DataFeature> commonFeatures = new ArrayList<DataFeature>(){{
-			add(new BPTIFeature(BPTIFeatureType.Chi1));
-			add(new BPTIFeature(BPTIFeatureType.Chi2));
-			add(new BPTIFeature(BPTIFeatureType.HBonds));
-			add(new BPTIFeature(BPTIFeatureType.RMSD));
+			add(new TestFeature(0));
 		}};
 
 		final List<DataSample> samples1 = new ArrayList<DataSample>(){{
-			add(new BPTISample(1));
-			add(new BPTISample(2));
+			add(new TestSample(1));
+			add(new TestSample(2));
 		}};
 		final List<DataSample> samples2 = new ArrayList<DataSample>(){{
-			add(new BPTISample(2));
-			add(new BPTISample(3));
+			add(new TestSample(2));
+			add(new TestSample(3));
 		}};
 		final List<DataSample> samples3 = new ArrayList<DataSample>(){{
-			add(new BPTISample(3));
+			add(new TestSample(3));
 		}};
 		final List<DataSample> samples4 = new ArrayList<DataSample>(){{
-			add(new BPTISample(3));
-			add(new BPTISample(4));
+			add(new TestSample(3));
+			add(new TestSample(4));
 		}};
 		final List<DataSample> samples5 = new ArrayList<DataSample>(){{
-			add(new BPTISample(4));
-			add(new BPTISample(5));
+			add(new TestSample(4));
+			add(new TestSample(5));
 		}};
 
 		List<Job> jobs = new ArrayList<Job>(){{
-			add(new Job(DataSet.BPTI, samples1, commonFeatures));
-			add(new Job(DataSet.BPTI, samples2, commonFeatures));
-			add(new Job(DataSet.BPTI, samples3, commonFeatures));
-			add(new Job(DataSet.BPTI, samples4, commonFeatures));
-			add(new Job(DataSet.BPTI, samples5, commonFeatures));
+			add(new Job(DataSet.None, samples1, commonFeatures));
+			add(new Job(DataSet.None, samples2, commonFeatures));
+			add(new Job(DataSet.None, samples3, commonFeatures));
+			add(new Job(DataSet.None, samples4, commonFeatures));
+			add(new Job(DataSet.None, samples5, commonFeatures));
 		}};
 
 		JobGroup jobGroup = new JobGroup(jobs, JobGroupType.SharedSamples);
@@ -311,59 +298,56 @@ public class TestTaskPlan {
 	public void testMoreComplexCase() {
 
 		final List<DataFeature> commonFeatures = new ArrayList<DataFeature>(){{
-			add(new BPTIFeature(BPTIFeatureType.Chi1));
-			add(new BPTIFeature(BPTIFeatureType.Chi2));
-			add(new BPTIFeature(BPTIFeatureType.HBonds));
-			add(new BPTIFeature(BPTIFeatureType.RMSD));
+			add(new TestFeature(0));
 		}};
 
 		final List<DataSample> samples1 = new ArrayList<DataSample>(){{
-			add(new BPTISample(1));
-			add(new BPTISample(2));
+			add(new TestSample(1));
+			add(new TestSample(2));
 		}};
 		final List<DataSample> samples2 = new ArrayList<DataSample>(){{
-			add(new BPTISample(4));
-			add(new BPTISample(5));
+			add(new TestSample(4));
+			add(new TestSample(5));
 		}};
 		final List<DataSample> samples3 = new ArrayList<DataSample>(){{
-			add(new BPTISample(7));
-			add(new BPTISample(8));
+			add(new TestSample(7));
+			add(new TestSample(8));
 		}};
 		final List<DataSample> samples4 = new ArrayList<DataSample>(){{
-			add(new BPTISample(2));
-			add(new BPTISample(7));
+			add(new TestSample(2));
+			add(new TestSample(7));
 		}};
 		final List<DataSample> samples5 = new ArrayList<DataSample>(){{
-			add(new BPTISample(4));
-			add(new BPTISample(2));
+			add(new TestSample(4));
+			add(new TestSample(2));
 		}};
 		final List<DataSample> samples6 = new ArrayList<DataSample>(){{
-			add(new BPTISample(2));
-			add(new BPTISample(7));
-			add(new BPTISample(8));
-			add(new BPTISample(10));
+			add(new TestSample(2));
+			add(new TestSample(7));
+			add(new TestSample(8));
+			add(new TestSample(10));
 		}};
 		final List<DataSample> samples7 = new ArrayList<DataSample>(){{
-			add(new BPTISample(1));
-			add(new BPTISample(2));
-			add(new BPTISample(3));
+			add(new TestSample(1));
+			add(new TestSample(2));
+			add(new TestSample(3));
 		}};
 		final List<DataSample> samples8 = new ArrayList<DataSample>(){{
-			add(new BPTISample(1));
-			add(new BPTISample(4));
-			add(new BPTISample(8));
-			add(new BPTISample(9));
+			add(new TestSample(1));
+			add(new TestSample(4));
+			add(new TestSample(8));
+			add(new TestSample(9));
 		}};
 
 		List<Job> jobs = new ArrayList<Job>(){{
-			add(new Job(DataSet.BPTI, samples1, commonFeatures));
-			add(new Job(DataSet.BPTI, samples2, commonFeatures));
-			add(new Job(DataSet.BPTI, samples3, commonFeatures));
-			add(new Job(DataSet.BPTI, samples4, commonFeatures));
-			add(new Job(DataSet.BPTI, samples5, commonFeatures));
-			add(new Job(DataSet.BPTI, samples6, commonFeatures));
-			add(new Job(DataSet.BPTI, samples7, commonFeatures));
-			add(new Job(DataSet.BPTI, samples8, commonFeatures));
+			add(new Job(DataSet.None, samples1, commonFeatures));
+			add(new Job(DataSet.None, samples2, commonFeatures));
+			add(new Job(DataSet.None, samples3, commonFeatures));
+			add(new Job(DataSet.None, samples4, commonFeatures));
+			add(new Job(DataSet.None, samples5, commonFeatures));
+			add(new Job(DataSet.None, samples6, commonFeatures));
+			add(new Job(DataSet.None, samples7, commonFeatures));
+			add(new Job(DataSet.None, samples8, commonFeatures));
 		}};
 
 		JobGroup jobGroup = new JobGroup(jobs, JobGroupType.SharedSamples);
@@ -384,17 +368,17 @@ public class TestTaskPlan {
 		final Random rand = new Random();
 
 		final List<DataFeature> commonFeatures = new ArrayList<DataFeature>(){{
-			add(new BPTIFeature(BPTIFeatureType.Chi1));
+			add(new TestFeature(0));
 		}};
 
 		List<Job> jobs = new ArrayList<Job>(){{
 			for (int i = 0; i < numJobs; i++) {
 				Set<DataSample> samples = new HashSet<DataSample>(){{
 					for (int j = 0; j < numWork; j++) {
-						add(new BPTISample(rand.nextInt(numWork/2)+1));
+						add(new TestSample(rand.nextInt(numWork/2)));
 					}
 				}};
-				add(new Job(DataSet.BPTI, samples, commonFeatures));
+				add(new Job(DataSet.None, samples, commonFeatures));
 			}
 		}};
 
