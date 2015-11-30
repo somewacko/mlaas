@@ -1,9 +1,12 @@
-package mlaas.dl.bpti;
+package mlaas.bpti;
+
+import mlaas.DataFeature;
+import mlaas.DataSet;
 
 /**
  * Features available in the BPTI data set.
  */
-public class BPTIFeature implements mlaas.dl.DataFeature {
+public class BPTIFeature implements DataFeature {
 
 	private BPTIFeatureType type;
 
@@ -21,7 +24,8 @@ public class BPTIFeature implements mlaas.dl.DataFeature {
 	}
 
 	@Override
-	public int getId() {
-		return this.type.ordinal();
-	}
+	public int getId() { return this.type.ordinal(); }
+
+	@Override
+	public DataSet getDataSet() { return DataSet.BPTI; }
 }

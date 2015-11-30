@@ -33,9 +33,9 @@ import java.io.FileOutputStream;
 import java.util.Arrays;
 
 /**
- * Created by Aileme on 11/16/15.
+ * Created by bimangujral on 11/30/15.
  */
-public class BptiSparkExample {
+public class FictitiousSparkExample {
     private static Logger log = LoggerFactory.getLogger(BptiSparkExample.class);
 
     public static void main(String[] args) throws Exception {
@@ -45,19 +45,19 @@ public class BptiSparkExample {
                 .setAppName("sparktest");
 
         Nd4j.ENFORCE_NUMERICAL_STABILITY = true;
-        final int numFeat = 15; //970;
-        int outputNum = 5;
-        int numSamples = 4000;
-        int iterations = 20;
+        final int numFeat = 2;
+        int outputNum = 2;
+        int numSamples = 12;
+        int batchSize = 3;
+        int iterations = 20 ; //1000;
         int seed = 123;
-        int listenerFreq = iterations/25;
-        int batchSize = 40; //10;
+        int listenerFreq = iterations/10;
         SplitTestAndTrain trainTest;
 
         //Load data..
         RecordReader reader = new CSVRecordReader(0, ",");
 
-        reader.initialize(new FileSplit(new File("/Users/bimangujral/Documents/Sem3/BigData/Project/Code/mlaas/data/pca_features4000.txt")));
+        reader.initialize(new FileSplit(new File("/Users/bimangujral/Documents/Sem3/BigData/Project/Code/mlaas/dl4j/mlaas-bpti/src/main/resources/fictitious.txt")));
 
         //log.info("Build model....");
         JavaSparkContext sc = new JavaSparkContext(sparkConf);
@@ -130,5 +130,5 @@ public class BptiSparkExample {
 
         System.out.println(eval.stats());
         System.out.println("****************Example finished********************");
-    }
+}
 }

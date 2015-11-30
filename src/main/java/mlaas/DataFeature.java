@@ -1,4 +1,4 @@
-package mlaas.dl;
+package mlaas;
 
 /**
  * Interface for implementing features in different data sets.
@@ -16,4 +16,10 @@ public interface DataFeature {
 	 * @return The unique ID for this feature.
 	 */
 	int getId();
+
+	/**
+	 * The data set which this feature is derived from.
+	 * @return The associated data set.
+	 */
+	DataSet getDataSet();
 }
