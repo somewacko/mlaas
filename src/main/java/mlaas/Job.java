@@ -1,6 +1,6 @@
 package mlaas;
 
-import java.util.List;
+import java.util.*;
 
 /**
  * A job requested by a user to train a model on a given data set and some subset of available samples and features.
@@ -10,8 +10,8 @@ import java.util.List;
 public class Job {
 
 	private DataSet dataSet;
-	private List<DataSample> samples;
-	private List<DataFeature> features;
+	private Set<DataSample> samples;
+	private Set<DataFeature> features;
 	private JobStatus status = JobStatus.Waiting;
 
 	/**
@@ -20,14 +20,14 @@ public class Job {
 	 * @param samples Which samples this job should train on.
 	 * @param features Which features this job should train on.
 	 */
-	public Job(DataSet dataSet, List<DataSample> samples, List<DataFeature> features) {
+	public Job(DataSet dataSet, Collection<DataSample> samples, Collection<DataFeature> features) {
 		this.dataSet = dataSet;
-		this.samples = samples;
-		this.features = features;
+		this.samples = new HashSet<>(samples);
+		this.features = new HashSet<>(features);
 	}
 
 	public DataSet getDataSet() { return this.dataSet; }
-	public List<DataSample> getSamples() { return this.samples; }
-	public List<DataFeature> getFeatures() { return this.features; }
+	public Set<DataSample> getSamples() { return this.samples; }
+	public Set<DataFeature> getFeatures() { return this.features; }
 	public JobStatus getStatus() { return this.status; }
 }

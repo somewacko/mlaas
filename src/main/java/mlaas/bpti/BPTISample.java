@@ -6,7 +6,7 @@ import mlaas.DataSet;
 /**
  * Samples available in the BPTI data set.
  */
-public class BPTISample implements DataSample {
+public class BPTISample extends DataSample {
 
 	int index;
 	private String filename;
@@ -16,7 +16,7 @@ public class BPTISample implements DataSample {
 	 * @param index the index for this sample.
 	 * @throws RuntimeException if index is out of bounds.
 	 */
-	BPTISample(int index) {
+	public BPTISample(int index) throws RuntimeException {
 
 		if (index < 0 || 4000 < index) {
 			throw new RuntimeException("Index out of bounds");
@@ -27,14 +27,15 @@ public class BPTISample implements DataSample {
 		}
 	}
 
-	@Override
 	public String getFilename() {
 		return this.filename;
 	}
 
-	@Override
-	public int getId() { return this.index; }
+	public int getId() {
+		return this.index;
+	}
 
-	@Override
-	public DataSet getDataSet() { return DataSet.BPTI; }
+	public DataSet getDataSet() {
+		return DataSet.BPTI;
+	}
 }

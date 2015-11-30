@@ -6,7 +6,7 @@ import mlaas.DataSet;
 /**
  * Features available in the BPTI data set.
  */
-public class BPTIFeature implements DataFeature {
+public class BPTIFeature extends DataFeature {
 
 	private BPTIFeatureType type;
 

@@ -1,6 +1,6 @@
 package mlaas;
 
-import java.util.List;
+import java.util.*;
 
 /**
  * A grouping of jobs that have shared tasks that can be run together.
@@ -19,6 +19,42 @@ public class JobGroup {
 		this.jobs = jobs;
 		this.type = type;
 	};
+
+	/**
+	 * Finds the set of all work in this group.
+	 * @return The set of all work.
+	 */
+	public Set<DataUnit> allWork() {
+
+		Set<DataUnit> allWork = new HashSet<>();
+
+		for (Job job : this.jobs) {
+			switch (this.type) {
+				case SharedFeatures:
+					allWork.addAll(job.getFeatures());
+					break;
+				case SharedSamples: default:
+					allWork.addAll(job.getSamples());
+			}
+		}
+		return allWork;
+	}
+
+	/**
+	 * Extracts the appropriate unit of work from a given job.
+	 * @param job
+	 * @return The appropriate work for this task.
+	 */
+	public Set<DataUnit> extractWork(Job job) {
+		switch (this.type) {
+			case SharedFeatures:
+				return new HashSet<DataUnit>(job.getFeatures());
+			case SharedSamples: default:
+				return new HashSet<DataUnit>(job.getSamples());
+		}
+	}
+
+	// Getters and setters
 
 	public List<Job> getJobs() { return this.jobs; }
 	public JobGroupType getType() { return this.type; }
