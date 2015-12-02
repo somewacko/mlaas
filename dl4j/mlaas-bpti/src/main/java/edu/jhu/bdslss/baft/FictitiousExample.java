@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 
+import java.io.File;
 import java.util.Arrays;
 
 /**
@@ -39,7 +40,7 @@ public class FictitiousExample {
         int outputNum = 2;
         //int numSamples = 1000;
         //int batchSize = 20;
-        int iterations = 1000;
+        int iterations = 100 ; //1000;
         int seed = 123;
         int listenerFreq = iterations/10;
         //int splitTrainNum = (int) (batchSize*.8);

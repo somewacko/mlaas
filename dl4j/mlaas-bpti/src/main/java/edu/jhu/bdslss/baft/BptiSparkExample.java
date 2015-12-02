@@ -48,16 +48,16 @@ public class BptiSparkExample {
         final int numFeat = 15; //970;
         int outputNum = 5;
         int numSamples = 4000;
-        int iterations = 20;
+        int iterations = 50;
         int seed = 123;
         int listenerFreq = iterations/25;
-        int batchSize = 40; //10;
+        int batchSize = 400 ; //40; //10;
         SplitTestAndTrain trainTest;
 
         //Load data..
         RecordReader reader = new CSVRecordReader(0, ",");
 
-        reader.initialize(new FileSplit(new File("/Users/bimangujral/Documents/Sem3/BigData/Project/Code/mlaas/data/pca_features4000.txt")));
+        reader.initialize(new FileSplit(new File("/local/bdslss15-baft/resources/pca_features4000.txt")));// /Users/bimangujral/Documents/Sem3/BigData/Project/Code/mlaas/data/pca_features4000.txt")));
 
         //log.info("Build model....");
         JavaSparkContext sc = new JavaSparkContext(sparkConf);
@@ -66,7 +66,7 @@ public class BptiSparkExample {
                 .seed(seed).batchSize(batchSize)
                 .iterations(iterations)
                 .constrainGradientToUnitNorm(true).useDropConnect(true)
-                //.learningRate(1e-1)
+                .learningRate((1e-1)*5)
                 .l1(0.3).regularization(false).l2(1e-3)
                 .constrainGradientToUnitNorm(true).optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
                 .list(5)
@@ -113,6 +113,7 @@ public class BptiSparkExample {
 
         //Train
         log.info("Train model....");
+        /* for checking shuffle
         MultiLayerNetwork network2 = master.fitDataSet(data);
         FileOutputStream fos  = new FileOutputStream("params.txt");
         DataOutputStream dos = new DataOutputStream(fos);
