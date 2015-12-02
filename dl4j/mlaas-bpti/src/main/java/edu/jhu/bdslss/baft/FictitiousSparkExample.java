@@ -48,75 +48,48 @@ public class FictitiousSparkExample {
         final int numFeat = 2;
         int outputNum = 2;
         int numSamples = 12;
-        int batchSize = 3;
-        int iterations = 100 ; //1000;
+
+        int batchSize = 7;
+        int iterations = 20 ; //1000;
+
         int seed = 123;
-        int listenerFreq = iterations/10;
+        int listenerFreq = iterations/5;
         SplitTestAndTrain trainTest;
 
         //Load data..
         RecordReader reader = new CSVRecordReader(0, ",");
 
-        reader.initialize(new FileSplit(new File("/local/bdslss15-baft/resources/fictitious.txt")));
+        reader.initialize(new FileSplit(new File("/Users/Aileme/git/mlaas/dl4j/mlaas-bpti/src/main/resources/fictitious.txt")));
 
         //log.info("Build model....");
         JavaSparkContext sc = new JavaSparkContext(sparkConf);
         String activation = "tanh";
         MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
-                .seed(seed).batchSize(batchSize) // Seed to lock in weight initialization for tuning
-                .iterations(iterations) // # training iterations predict/classify & backprop
-                .learningRate(1e-1f) // Optimization step size
+                .seed(seed) // Seed to lock in weight initialization for tuning
+                .batchSize(batchSize).iterations(iterations) // # training iterations predict/classify & backprop
+                .learningRate(9e-1f) // Optimization step size
                 .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT) // Backprop method (calculate the gradients)
                 .constrainGradientToUnitNorm(false).l2(2e-4).regularization(false)
                 .list(3) // # NN layers (does not count input layer)
-                /*.seed(seed).batchSize(batchSize)
-                .iterations(iterations)
-                .constrainGradientToUnitNorm(true).useDropConnect(true)
-                .learningRate(1e-1)
-                //.l1(0.3).regularization(false).l2(1e-3)
-                .constrainGradientToUnitNorm(true).optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
-                .list(3)
-                .layer(0, new DenseLayer.Builder().nIn(numFeat).nOut(9)
-                        .activation(activation).dropOut(0.5)
-                        .weightInit(WeightInit.XAVIER)
-                        .build())
-                .layer(1, new DenseLayer.Builder().nIn(9).nOut(7)
-                        .activation(activation).dropOut(0.5)
-                        .weightInit(WeightInit.XAVIER)
-                        .build())
-                .layer(2, new DenseLayer.Builder().nIn(7).nOut(5)
-                        .activation(activation).dropOut(0.5)
-                        .weightInit(WeightInit.XAVIER)
-                        .build())
-                .layer(3, new DenseLayer.Builder().nIn(5).nOut(4)
-                        .activation(activation)
-                        .weightInit(WeightInit.XAVIER)
-                        .build())
-                .layer(4, new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
-                        .weightInit(WeightInit.XAVIER)
-                        .activation("softmax")
-                        .nIn(4).nOut(outputNum).build())
-                .backprop(true).pretrain(false)
-                .build();*/
                 .layer(0, new DenseLayer.Builder()
-                        .nIn(numFeat) // # input nodes
-                        .nOut(4) // # output nodes
-                        .activation(activation)
-                        .weightInit(WeightInit.XAVIER)
-                        .build()
+                                .nIn(numFeat) // # input nodes
+                                .nOut(4) // # output nodes
+                                .activation(activation)
+                                .weightInit(WeightInit.XAVIER)
+                                .build()
                 ).layer(1, new DenseLayer.Builder()
-                        .nIn(4) // # input nodes
-                        .nOut(4) // # output nodes
-                        .activation(activation)
-                        .weightInit(WeightInit.XAVIER)
-                        .build()
+                                .nIn(4) // # input nodes
+                                .nOut(4) // # output nodes
+                                .activation(activation)
+                                .weightInit(WeightInit.XAVIER)
+                                .build()
                 )
                 .layer(2, new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
-                        .nIn(4) // # input nodes
-                        .nOut(outputNum) // # output nodes
-                        .activation("softmax")
-                        .weightInit(WeightInit.XAVIER)
-                        .build()
+                                .nIn(4) // # input nodes
+                                .nOut(outputNum) // # output nodes
+                                .activation("softmax")
+                                .weightInit(WeightInit.XAVIER)
+                                .build()
                 )
                 .backprop(true).pretrain(false).build();
 
@@ -131,7 +104,7 @@ public class FictitiousSparkExample {
         //next.normalizeZeroMeanZeroUnitVariance();
         next.shuffle();
         //log.info("Num of examples: " + String.valueOf(next.numExamples()));
-        trainTest = next.splitTestAndTrain(0.8);
+        trainTest = next.splitTestAndTrain(0.7);
 
         SparkDl4jMultiLayer master = new SparkDl4jMultiLayer(sc,conf);
         //number of partitions should be partitioned by batch size
@@ -141,11 +114,11 @@ public class FictitiousSparkExample {
         //Train
         log.info("Train model....");
         MultiLayerNetwork network2 = master.fitDataSet(data);
-        FileOutputStream fos  = new FileOutputStream("params.txt");
+        /*FileOutputStream fos  = new FileOutputStream("params.txt");
         DataOutputStream dos = new DataOutputStream(fos);
         Nd4j.write(dos, network2.params());
         dos.flush();
-        dos.close();
+        dos.close();*/
 
         log.info("Evaluate model....");
         Evaluation eval = new Evaluation(outputNum);

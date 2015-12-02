@@ -13,7 +13,6 @@ import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
 import org.deeplearning4j.nn.conf.Updater;
-import org.deeplearning4j.nn.conf.layers.DenseLayer;
 import org.deeplearning4j.nn.conf.layers.OutputLayer;
 import org.deeplearning4j.nn.conf.layers.RBM;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
@@ -36,9 +35,9 @@ import java.util.Arrays;
 import java.util.Collections;
 
 /**
- * Created by Aileme on 11/16/15.
+ * Created by Aileme on 12/2/15.
  */
-public class BptiSparkExample {
+public class BptiRBMSparkExample {
     private static Logger log = LoggerFactory.getLogger(BptiSparkExample.class);
 
     public static void main(String[] args) throws Exception {
@@ -51,51 +50,64 @@ public class BptiSparkExample {
         final int numFeat = 15; //970;
         int outputNum = 5;
         int numSamples = 4000;
-        int iterations = 50;
+        int iterations = 40;
         int seed = 123;
         int listenerFreq = iterations/25;
-        int batchSize = 100; //10;
+        int batchSize = 10; //10;
         SplitTestAndTrain trainTest;
 
         //Load data..
         RecordReader reader = new CSVRecordReader(0, ",");
-
 
         reader.initialize(new FileSplit(new File("/local/bdslss15-baft/resources/pca_features4000.txt")));
 
         //log.info("Build model....");
         JavaSparkContext sc = new JavaSparkContext(sparkConf);
         String activation = "tanh";
-
+        RBM.VisibleUnit vu = RBM.VisibleUnit.GAUSSIAN;
+        RBM.HiddenUnit hu = RBM.HiddenUnit.RECTIFIED;
         MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
-                .seed(seed).batchSize(batchSize)
+                .seed(seed).learningRate(1e-6f).batchSize(batchSize)
+                .constrainGradientToUnitNorm(true)
                 .iterations(iterations)
-                .constrainGradientToUnitNorm(true).useDropConnect(true)
-                .learningRate((1e-1)*5)
-                .l1(0.3).regularization(false).l2(1e-3)
-                .constrainGradientToUnitNorm(true).optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
-                .list(5)
-                .layer(0, new DenseLayer.Builder().nIn(numFeat).nOut(750)
-                        .activation(activation).dropOut(0.5)
-                        .weightInit(WeightInit.XAVIER)
+                .momentum(0.5)
+                .momentumAfter(Collections.singletonMap(3, 0.9))
+                .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
+                .list(4)
+                .layer(0, new RBM.Builder(RBM.HiddenUnit.RECTIFIED, RBM.VisibleUnit.GAUSSIAN)
+                        .nIn(numFeat) // # input nodes
+                        .nOut(100) // # fully connected hidden layer nodes. Add list if multiple layers.
+                        .weightInit(WeightInit.XAVIER) // Weight initialization
+                        .k(1) // # contrastive divergence iterations
+                        .activation(activation) // Activation function type
+                        .lossFunction(LossFunctions.LossFunction.RMSE_XENT) // Loss function type
+                        .updater(Updater.ADAGRAD)
+                        .dropOut(0.5)
                         .build())
-                .layer(1, new DenseLayer.Builder().nIn(750).nOut(500)
-                        .activation(activation).dropOut(0.5)
-                        .weightInit(WeightInit.XAVIER)
+                .layer(1, new RBM.Builder(RBM.HiddenUnit.RECTIFIED, RBM.VisibleUnit.GAUSSIAN)
+                        .nIn(100) // # input nodes
+                        .nOut(50) // # fully connected hidden layer nodes. Add list if multiple layers.
+                        .weightInit(WeightInit.XAVIER) // Weight initialization
+                        .k(1) // # contrastive divergence iterations
+                        .activation(activation) // Activation function type
+                        .lossFunction(LossFunctions.LossFunction.RMSE_XENT) // Loss function type
+                        .updater(Updater.ADAGRAD)
+                        .dropOut(0.5)
                         .build())
-                .layer(2, new DenseLayer.Builder().nIn(500).nOut(300)
-                        .activation(activation).dropOut(0.5)
-                        .weightInit(WeightInit.XAVIER)
+                .layer(2, new RBM.Builder(RBM.HiddenUnit.RECTIFIED, RBM.VisibleUnit.GAUSSIAN)
+                        .nIn(50) // # input nodes
+                        .nOut(20) // # fully connected hidden layer nodes. Add list if multiple layers.
+                        .weightInit(WeightInit.XAVIER) // Weight initialization
+                        .k(1) // # contrastive divergence iterations
+                        .activation(activation) // Activation function type
+                        .lossFunction(LossFunctions.LossFunction.RMSE_XENT) // Loss function type
+                        .updater(Updater.ADAGRAD)
+                        .dropOut(0.5)
                         .build())
-                .layer(3, new DenseLayer.Builder().nIn(300).nOut(200)
-                        .activation(activation)
-                        .weightInit(WeightInit.XAVIER)
-                        .build())
-                .layer(4, new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
-                        .weightInit(WeightInit.XAVIER)
-                        .activation("softmax")
-                        .nIn(200).nOut(outputNum).build())
-                .backprop(true).pretrain(false)
+                .layer(3, new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD).activation("softmax")
+                        .nIn(20).nOut(outputNum).build())
+                .pretrain(true)
+                .backprop(true)
                 .build();
 
         MultiLayerNetwork model = new MultiLayerNetwork(conf);
@@ -119,7 +131,6 @@ public class BptiSparkExample {
 
         //Train
         log.info("Train model....");
-        // for checking shuffle
         MultiLayerNetwork network2 = master.fitDataSet(data);
         FileOutputStream fos  = new FileOutputStream("params.txt");
         DataOutputStream dos = new DataOutputStream(fos);
