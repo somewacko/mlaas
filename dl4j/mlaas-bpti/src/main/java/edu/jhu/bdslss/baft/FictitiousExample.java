@@ -38,8 +38,8 @@ public class FictitiousExample {
         final int numFeat = 2;
         int outputNum = 2;
         //int numSamples = 1000;
-        //int batchSize = 20;
-        int iterations = 1000;
+        int batchSize = 10;
+        int iterations = 20;
         int seed = 123;
         int listenerFreq = iterations/10;
         //int splitTrainNum = (int) (batchSize*.8);
@@ -94,8 +94,8 @@ public class FictitiousExample {
                 .build();*/
         MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
                 .seed(seed) // Seed to lock in weight initialization for tuning
-                .iterations(iterations) // # training iterations predict/classify & backprop
-                .learningRate(1e-1f) // Optimization step size
+                .batchSize(batchSize).iterations(iterations) // # training iterations predict/classify & backprop
+                .learningRate(9e-1f) // Optimization step size
                 .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT) // Backprop method (calculate the gradients)
                 .constrainGradientToUnitNorm(false).l2(2e-4).regularization(false)
                 .list(3) // # NN layers (does not count input layer)
