@@ -1,5 +1,6 @@
 package edu.jhu.bdslss.baft;
 
+import org.apache.commons.io.FileUtils;
 import org.canova.api.records.reader.RecordReader;
 import org.canova.api.records.reader.impl.CSVRecordReader;
 import org.canova.api.split.FileSplit;
@@ -26,18 +27,38 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
+
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionBuilder;
 
 /**
  * Created by Aileme on 11/13/15.
  */
 public class BptiExample {
     private static Logger log = LoggerFactory.getLogger(BptiExample.class);
+    static public LinkedList<Option> options = new LinkedList<Option>();
 
     public static void main(String[] args) throws Exception {
+        // To run:
+        // BptiExample -input_file [input file] -output_model_conf_file [output conf file]
+        //              -output_model_weights_file [output weights file -output_stats_file [stats file]
+        // Parse the command line.
+        String[] mandatory_args = { "input_file", "output_model_conf_file",
+                "output_model_weights_file", "output_stats_file"};
+        createCommandLineOptions();
+        CommandLineUtilities.initCommandLineParameters(args, BptiExample.options, mandatory_args);
+
+        String inputFile = CommandLineUtilities.getOptionValue("input_file");
+        String outputModelConf = CommandLineUtilities.getOptionValue("output_model_conf_file");
+        String outputModelWeights = CommandLineUtilities.getOptionValue("output_model_weights_file");
+        String outputStats = CommandLineUtilities.getOptionValue("output_stats_file");
 
         Nd4j.ENFORCE_NUMERICAL_STABILITY = true;
         final int numFeat = 15;//970;
@@ -56,7 +77,8 @@ public class BptiExample {
 
         //Load data..
         RecordReader reader = new CSVRecordReader(0, ",");
-        reader.initialize(new FileSplit(new ClassPathResource("pca_features4000.txt").getFile()));
+        //reader.initialize(new FileSplit(new ClassPathResource("pca_features4000.txt").getFile()));
+        reader.initialize(new FileSplit(new File(inputFile)));
 
         log.info("Build model....");
         /*MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
@@ -185,14 +207,45 @@ public class BptiExample {
         eval.eval(trainTest.getTest().getLabels(), predict2);
 
 
-        log.info(eval.stats());
-
         predict2 = model.output(trainTest.getTrain().getFeatureMatrix());
         eval.eval(trainTest.getTrain().getLabels(), predict2);
         log.info("********Test on Train************");
         log.info(eval.stats());
 
+        String stats = eval.stats();
+        log.info(stats);
+        //Save stats to file
+        //PrintStream stream = new PrintStream(outputStats);
+        //stream.println(stats);
+        FileUtils.write(new File(outputStats), stats);
+
+        //Save model to file
+        OutputStream fos = Files.newOutputStream(Paths.get(outputModelWeights));
+        DataOutputStream dos = new DataOutputStream(fos);
+        Nd4j.write(model.params(), dos);
+        dos.flush();
+        dos.close();
+        FileUtils.write(new File(outputModelConf), model.getLayerWiseConfigurations().toJson());
+
         log.info("****************Example finished********************");
+    }
+
+    public static void registerOption(String option_name, String arg_name, boolean has_arg, String description) {
+        OptionBuilder.withArgName(arg_name);
+        OptionBuilder.hasArg(has_arg);
+        OptionBuilder.withDescription(description);
+        Option option = OptionBuilder.create(option_name);
+
+        BptiExample.options.add(option);
+    }
+
+    private static void createCommandLineOptions() {
+        registerOption("input_file", "String", true, "The path to the input file.");
+        registerOption("output_model_conf_file", "String", true, "The path to save the computed model conf to.");
+        registerOption("output_model_weights_file", "String", true, "The path to save the computed model weights to.");
+        registerOption("output_stats_file", "String", true, "The path to save the model stats to.");
+
+        // Other options will be added here.
     }
 
 }
