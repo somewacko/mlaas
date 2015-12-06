@@ -67,7 +67,7 @@ public class BptiRBMSparkExample {
         RBM.VisibleUnit vu = RBM.VisibleUnit.GAUSSIAN;
         RBM.HiddenUnit hu = RBM.HiddenUnit.RECTIFIED;
         MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
-                .seed(seed).learningRate(1e-6f).batchSize(batchSize)
+                .seed(seed).learningRate(1e-6f)//.batchSize(batchSize)
                 .constrainGradientToUnitNorm(true)
                 .iterations(iterations)
                 .momentum(0.5)
@@ -104,7 +104,7 @@ public class BptiRBMSparkExample {
                         .updater(Updater.ADAGRAD)
                         .dropOut(0.5)
                         .build())
-                .layer(3, new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD).activation("softmax")
+                .layer(3, new OutputLayer.Builder(LossFunctions.LossFunction.MCXENT).activation("softmax")
                         .nIn(20).nOut(outputNum).build())
                 .pretrain(true)
                 .backprop(true)
@@ -132,11 +132,11 @@ public class BptiRBMSparkExample {
         //Train
         log.info("Train model....");
         MultiLayerNetwork network2 = master.fitDataSet(data);
-        FileOutputStream fos  = new FileOutputStream("params.txt");
+        /*FileOutputStream fos  = new FileOutputStream("params.txt");
         DataOutputStream dos = new DataOutputStream(fos);
         Nd4j.write(dos, network2.params());
         dos.flush();
-        dos.close();
+        dos.close();*/
 
         log.info("Evaluate model....");
         Evaluation eval = new Evaluation(outputNum);
