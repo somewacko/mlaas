@@ -53,7 +53,7 @@ public class BptiRBMSparkExample {
         int iterations = 40;
         int seed = 123;
         int listenerFreq = iterations/25;
-        int batchSize = 10; //10;
+        int batchSize = 400; //10;
         SplitTestAndTrain trainTest;
 
         //Load data..
@@ -67,7 +67,7 @@ public class BptiRBMSparkExample {
         RBM.VisibleUnit vu = RBM.VisibleUnit.GAUSSIAN;
         RBM.HiddenUnit hu = RBM.HiddenUnit.RECTIFIED;
         MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
-                .seed(seed).learningRate(1e-6f).batchSize(batchSize)
+                .seed(seed).learningRate(1e-3f).batchSize(batchSize)
                 .constrainGradientToUnitNorm(true)
                 .iterations(iterations)
                 .momentum(0.5)
@@ -119,7 +119,7 @@ public class BptiRBMSparkExample {
         DataSetIterator iter = new RecordReaderDataSetIterator(reader, numSamples,numFeat,outputNum);
         DataSet next = iter.next();
         //next.normalizeZeroMeanZeroUnitVariance();
-        next.shuffle();
+        //next.shuffle();
         //log.info("Num of examples: " + String.valueOf(next.numExamples()));
         double split = 0.8;
         trainTest = next.splitTestAndTrain(split);

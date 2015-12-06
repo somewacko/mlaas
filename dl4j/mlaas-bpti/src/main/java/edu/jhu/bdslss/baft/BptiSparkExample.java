@@ -54,7 +54,7 @@ public class BptiSparkExample {
         int iterations = 50;
         int seed = 123;
         int listenerFreq = iterations/25;
-        int batchSize = 100; //10;
+        int batchSize = 500; //10;
         SplitTestAndTrain trainTest;
 
         //Load data..
@@ -107,7 +107,7 @@ public class BptiSparkExample {
         DataSetIterator iter = new RecordReaderDataSetIterator(reader, numSamples,numFeat,outputNum);
         DataSet next = iter.next();
         //next.normalizeZeroMeanZeroUnitVariance();
-        next.shuffle();
+        //next.shuffle();
         //log.info("Num of examples: " + String.valueOf(next.numExamples()));
         double split = 0.8;
         trainTest = next.splitTestAndTrain(split);
