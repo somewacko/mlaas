@@ -51,14 +51,15 @@ public class BptiSparkExample {
         final int numFeat = 15; //970;
         int outputNum = 5;
         int numSamples = 4000;
-        int iterations = 20;
+        int iterations = 50;
         int seed = 123;
         int listenerFreq = iterations/25;
-        int batchSize = 100; //10;
+        int batchSize = 500; //10;
         SplitTestAndTrain trainTest;
 
         //Load data..
         RecordReader reader = new CSVRecordReader(0, ",");
+
 
         reader.initialize(new FileSplit(new File("/local/bdslss15-baft/resources/pca_features4000.txt")));
 
@@ -70,7 +71,7 @@ public class BptiSparkExample {
                 .seed(seed).batchSize(batchSize)
                 .iterations(iterations)
                 .constrainGradientToUnitNorm(true).useDropConnect(true)
-                //.learningRate(1e-1)
+                .learningRate((1e-1)*5)
                 .l1(0.3).regularization(false).l2(1e-3)
                 .constrainGradientToUnitNorm(true).optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
                 .list(5)
@@ -106,7 +107,7 @@ public class BptiSparkExample {
         DataSetIterator iter = new RecordReaderDataSetIterator(reader, numSamples,numFeat,outputNum);
         DataSet next = iter.next();
         //next.normalizeZeroMeanZeroUnitVariance();
-        next.shuffle();
+        //next.shuffle();
         //log.info("Num of examples: " + String.valueOf(next.numExamples()));
         double split = 0.8;
         trainTest = next.splitTestAndTrain(split);
@@ -118,6 +119,7 @@ public class BptiSparkExample {
 
         //Train
         log.info("Train model....");
+        // for checking shuffle
         MultiLayerNetwork network2 = master.fitDataSet(data);
         FileOutputStream fos  = new FileOutputStream("params.txt");
         DataOutputStream dos = new DataOutputStream(fos);

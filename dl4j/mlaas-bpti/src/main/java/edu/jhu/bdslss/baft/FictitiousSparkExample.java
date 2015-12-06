@@ -48,8 +48,10 @@ public class FictitiousSparkExample {
         final int numFeat = 2;
         int outputNum = 2;
         int numSamples = 12;
+
         int batchSize = 7;
         int iterations = 20 ; //1000;
+
         int seed = 123;
         int listenerFreq = iterations/5;
         SplitTestAndTrain trainTest;
@@ -62,36 +64,6 @@ public class FictitiousSparkExample {
         //log.info("Build model....");
         JavaSparkContext sc = new JavaSparkContext(sparkConf);
         String activation = "tanh";
-        /*MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
-                .seed(seed).batchSize(batchSize)
-                .iterations(iterations)
-                .constrainGradientToUnitNorm(true).useDropConnect(true)
-                //.learningRate(1e-1)
-                .l1(0.3).regularization(false).l2(1e-3)
-                .constrainGradientToUnitNorm(true).optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
-                .list(5)
-                .layer(0, new DenseLayer.Builder().nIn(numFeat).nOut(750)
-                        .activation(activation).dropOut(0.5)
-                        .weightInit(WeightInit.XAVIER)
-                        .build())
-                .layer(1, new DenseLayer.Builder().nIn(750).nOut(500)
-                        .activation(activation).dropOut(0.5)
-                        .weightInit(WeightInit.XAVIER)
-                        .build())
-                .layer(2, new DenseLayer.Builder().nIn(500).nOut(300)
-                        .activation(activation).dropOut(0.5)
-                        .weightInit(WeightInit.XAVIER)
-                        .build())
-                .layer(3, new DenseLayer.Builder().nIn(300).nOut(200)
-                        .activation(activation)
-                        .weightInit(WeightInit.XAVIER)
-                        .build())
-                .layer(4, new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
-                        .weightInit(WeightInit.XAVIER)
-                        .activation("softmax")
-                        .nIn(200).nOut(outputNum).build())
-                .backprop(true).pretrain(false)
-                .build();*/
         MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
                 .seed(seed) // Seed to lock in weight initialization for tuning
                 .batchSize(batchSize).iterations(iterations) // # training iterations predict/classify & backprop
