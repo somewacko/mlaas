@@ -1,15 +1,17 @@
-/*
-
- */
-
 package mlaas;
 
-import java.util.*;
-
+/**
+ * Class responsible for compiling samples and features into a single file for Spark/DL4J to use.
+ */
 public class FeatureManager {
 
-	public void getFeatures(ArrayList<DataSample> data, ArrayList<DataFeature> features)
-	{
-		
+	public static String formTrainingData(Task task) {
+		// Empty for now...
+		return "";
+	}
+
+	public static String formTestingData(Job job) {
+		// Empty for now...
+		return "";
 	}
 }
