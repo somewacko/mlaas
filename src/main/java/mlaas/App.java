@@ -15,6 +15,7 @@ import java.util.*;
 import spark.ModelAndView;
 import spark.template.velocity.VelocityTemplateEngine;
 import java.lang.IndexOutOfBoundsException;
+import mlaas.LearningManager;
 
 import static spark.Spark.*;
 
@@ -187,6 +188,8 @@ public class App {
 			System.out.println(jobGroup);
       System.out.println(jobGroup.getJobs());
       System.out.println(jobGroup.getType());
+      LearningManager learningManager = new LearningManager(jobGroup);
+      learningManager.run();
 
       //Send the job group to Learning Manager
       //learningManager(jobGroup) : This method will connect to learning manager.
