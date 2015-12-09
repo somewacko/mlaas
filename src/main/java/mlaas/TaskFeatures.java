@@ -21,4 +21,15 @@ public class TaskFeatures extends Task {
 	protected Set<DataUnit> extractWork(Job job) {
 		return new HashSet<DataUnit>(job.getFeatures());
 	}
+
+	public Set<DataFeature> getFeatures() {
+		Set<DataFeature> features = new HashSet<DataFeature>();
+		for (DataUnit work : this.getWork())
+			features.add((DataFeature)work);
+		return features;
+	}
+
+	public Set<DataSample> getSamples() {
+		return this.getJobs().iterator().next().getSamples();
+	}
 }

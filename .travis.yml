@@ -5,5 +5,5 @@ jdk:
   - oraclejdk8
 
 script:
-  - mvn install
+  - gradle
 

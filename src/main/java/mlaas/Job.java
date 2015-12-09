@@ -9,6 +9,9 @@ import java.util.*;
  */
 public class Job {
 
+	static int next_id = 0;
+
+	private int id;
 	private DataSet dataSet;
 	private Set<DataSample> samples;
 	private Set<DataFeature> features;
@@ -26,6 +29,9 @@ public class Job {
 		this.dataSet = dataSet;
 		this.samples = new HashSet<>(samples);
 		this.features = new HashSet<>(features);
+
+		this.id = Job.next_id;
+		Job.next_id += 1;
 	}
 
 	/**
@@ -53,4 +59,8 @@ public class Job {
 	public Set<DataSample> getSamples() { return this.samples; }
 	public Set<DataFeature> getFeatures() { return this.features; }
 	public JobStatus getStatus() { return this.status; }
+
+	public int getId() {
+		return this.id;
+	}
 }
