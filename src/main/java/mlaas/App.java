@@ -25,14 +25,24 @@ import static spark.Spark.*;
 public class App {
   //Initialize global job queue
   JobQueue jobQueue = new JobQueue();
+  Timer timer = new Timer ();
 
+  TimerTask hourlyTask = new TimerTask () {
+    @Override
+    public void run () {
+      System.out.println("ENTERING SCHEDULE");
+      App app = new App();
+      app.groupJobs();
+        // your code here...
+    }
+};
   public static void main(String[] args) {
     App app = new App();
     //To add images etc.
     staticFileLocation("/public");
     //Layout for html
     String layout = "templates/layout.vtl";
-
+    int cronTime = 1000*15*60;//1000*min*sec
     //Form Page
     get("/job_form", (request, response) -> {
       HashMap model = new HashMap();
@@ -64,8 +74,9 @@ public class App {
       model.put("template", "templates/jobs_grouped.vtl");
       return new ModelAndView(model, layout);
     }, new VelocityTemplateEngine());
-
+    app.timer.schedule (app.hourlyTask, 0l, cronTime);
   }
+
 
   public boolean createAndQueueJob(String dataSetInput, String sampleInput, String featureInput){
       System.out.println("Entering createJob");
