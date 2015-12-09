@@ -56,7 +56,7 @@ public class BptiExample {
 
         //Load data..
         RecordReader reader = new CSVRecordReader(0, ",");
-        reader.initialize(new FileSplit(new ClassPathResource("pca_features4000.txt").getFile()));
+        reader.initialize(new FileSplit(new ClassPathResource("mid_noh_features4000.txt").getFile()));
 
         log.info("Build model....");
         /*MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
@@ -90,25 +90,25 @@ public class BptiExample {
                 .list(5)
                 .layer(0, new DenseLayer.Builder().nIn(numFeat).nOut(100)
                         .activation(activ).dropOut(0.5)
-                        .weightInit(WeightInit.XAVIER)
+                        .weightInit(WeightInit.NORMALIZED)
                         .build())
                 .layer(1, new DenseLayer.Builder().nIn(100).nOut(75)       //300 200
                         .activation(activ)
-                        .weightInit(WeightInit.XAVIER)
+                        .weightInit(WeightInit.NORMALIZED)
                         .build())
                  .layer(2, new DenseLayer.Builder().nIn(75).nOut(75)       //300 200
                          .activation(activ)
-                         .weightInit(WeightInit.XAVIER)
+                         .weightInit(WeightInit.NORMALIZED)
                          .build())
                  .layer(3, new DenseLayer.Builder().nIn(75).nOut(50)       //300 200
                          .activation(activ)
-                         .weightInit(WeightInit.XAVIER)
+                         .weightInit(WeightInit.NORMALIZED)
                          .build())
                 .layer(4, new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
-                        .weightInit(WeightInit.XAVIER)
+                        .weightInit(WeightInit.SIZE)
                         .activation("softmax")
                         .nIn(50).nOut(outputNum).build())
-                .backprop(true).pretrain(false)
+                .backprop(true).pretrain(true)
                 .build();
 
         MultiLayerNetwork model = new MultiLayerNetwork(conf);

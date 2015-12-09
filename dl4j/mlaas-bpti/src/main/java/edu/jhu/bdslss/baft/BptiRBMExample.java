@@ -37,7 +37,7 @@ import java.util.Collections;
 /**
  * Created by Aileme on 12/2/15.
  */
-public class BptiRBMSparkExample {
+public class BptiRBMExample {
     private static Logger log = LoggerFactory.getLogger(BptiSparkExample.class);
 
     public static void main(String[] args) throws Exception {

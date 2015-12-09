@@ -48,21 +48,22 @@ public class BptiSparkExample {
                 .setAppName("sparktest");
 
         Nd4j.ENFORCE_NUMERICAL_STABILITY = true;
-        final int numFeat = 15; //970;
+        final int numFeat = 15;    //15;
         int outputNum = 5;
         int numSamples = 4000;
-        int iterations = 50;
+        int iterations = 40;
         int seed = 123;
         int listenerFreq = iterations/25;
-        int batchSize = 500; //10;
+        int batchSize = 2000; //10; //need at least this much batch size for learning
         SplitTestAndTrain trainTest;
 
         //Load data..
         RecordReader reader = new CSVRecordReader(0, ",");
 
 
-        reader.initialize(new FileSplit(new File("/local/bdslss15-baft/resources/pca_features4000.txt")));
-
+        reader.initialize(new FileSplit(new File("src/main/resources/mid_features4000.txt")));
+///local/bdslss15-baft/resources/avg_features4000.txt
+        //src/main/resources/pca_features4000.txt
         //log.info("Build model....");
         JavaSparkContext sc = new JavaSparkContext(sparkConf);
         String activation = "tanh";
@@ -70,31 +71,31 @@ public class BptiSparkExample {
         MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
                 .seed(seed).batchSize(batchSize)
                 .iterations(iterations)
-                .constrainGradientToUnitNorm(true).useDropConnect(true)
+                //.constrainGradientToUnitNorm(true).useDropConnect(true)
                 .learningRate((1e-1)*5)
-                .l1(0.3).regularization(false).l2(1e-3)
+                //.l1(0.3).regularization(false).l2(1e-3)
                 .constrainGradientToUnitNorm(true).optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
                 .list(5)
-                .layer(0, new DenseLayer.Builder().nIn(numFeat).nOut(750)
+                .layer(0, new DenseLayer.Builder().nIn(numFeat).nOut(100)
                         .activation(activation).dropOut(0.5)
                         .weightInit(WeightInit.XAVIER)
                         .build())
-                .layer(1, new DenseLayer.Builder().nIn(750).nOut(500)
+                .layer(1, new DenseLayer.Builder().nIn(100).nOut(75)
                         .activation(activation).dropOut(0.5)
                         .weightInit(WeightInit.XAVIER)
                         .build())
-                .layer(2, new DenseLayer.Builder().nIn(500).nOut(300)
+                .layer(2, new DenseLayer.Builder().nIn(75).nOut(75)
                         .activation(activation).dropOut(0.5)
                         .weightInit(WeightInit.XAVIER)
                         .build())
-                .layer(3, new DenseLayer.Builder().nIn(300).nOut(200)
+                .layer(3, new DenseLayer.Builder().nIn(75).nOut(50)
                         .activation(activation)
                         .weightInit(WeightInit.XAVIER)
                         .build())
                 .layer(4, new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
                         .weightInit(WeightInit.XAVIER)
                         .activation("softmax")
-                        .nIn(200).nOut(outputNum).build())
+                        .nIn(50).nOut(outputNum).build())
                 .backprop(true).pretrain(false)
                 .build();
 
