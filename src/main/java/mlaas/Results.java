@@ -5,5 +5,6 @@ package mlaas;
  */
 public class Results {
 	public DNNModel model;
-	public Double accuracy;
+	//public Double accuracy;
+	public String stats;
 }

@@ -1,5 +1,7 @@
 package mlaas;
 
+import net.didion.jwnl.data.Exc;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -127,7 +129,13 @@ public class LearningManager {
 		Results result = new Results();
 		result.model = model;
 		//results.accuracy = new Double(100); // :D
-		BufferedReader b = new BufferedReader(new FileReader(new File("/local/BigData/results/stats"+job.getId()+".dat")));
+		BufferedReader b = null;
+		try {
+			b = new BufferedReader(new FileReader(new File("/local/BigData/results/stats" + job.getId() + ".dat")));
+		}
+		catch(Exception f){
+			System.out.println("Cannot find file");
+		}
 		StringBuffer stringBuffer = new StringBuffer("");
 		String line="";
 		try {
@@ -160,7 +168,7 @@ public class LearningManager {
 				System.out.println( stringBuffer.toString());
 			}
 			catch(Exception e1){
-				System.out.println("Failed to write error in running Spark)";
+				System.out.println("Failed to write error in running Spark");
 			}
 		}
 	}
