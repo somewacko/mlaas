@@ -61,7 +61,7 @@ public class BptiSparkExample {
         //              -output_model_weights_file [output weights file -output_stats_file [stats file]
         // Parse the command line.
         String[] mandatory_args = { "input_file", "output_model_conf_file",
-                "output_model_weights_file", "output_stats_file"};
+                "output_model_weights_file"};   //, "output_stats_file"};
         createCommandLineOptions();
         CommandLineUtilities.initCommandLineParameters(args, BptiExample.options, mandatory_args);
 

@@ -50,7 +50,7 @@ public class BptiExample {
         // BptiExample -input_file [input file] -output_model_conf_file [output conf file]
         //              -output_model_weights_file [output weights file -output_stats_file [stats file]
         // Parse the command line.
-        String[] mandatory_args = { "input_file", "output_model_conf_file",
+        /*String[] mandatory_args = { "input_file", "output_model_conf_file",
                 "output_model_weights_file", "output_stats_file"};
         createCommandLineOptions();
         CommandLineUtilities.initCommandLineParameters(args, BptiExample.options, mandatory_args);
@@ -59,13 +59,13 @@ public class BptiExample {
         String outputModelConf = CommandLineUtilities.getOptionValue("output_model_conf_file");
         String outputModelWeights = CommandLineUtilities.getOptionValue("output_model_weights_file");
         String outputStats = CommandLineUtilities.getOptionValue("output_stats_file");
-
+*/
         Nd4j.ENFORCE_NUMERICAL_STABILITY = true;
-        final int numFeat = 15;//970;
+        final int numFeat = 78;//15;//970;
         int outputNum = 5;
         //int numSamples =1000;
         //int batchSize = 20;
-        int iterations =70;
+        int iterations =20;
         int seed = 123;
         int listenerFreq = iterations/5;
         //int splitTrainNum = (int) (batchSize*.8);
@@ -78,7 +78,7 @@ public class BptiExample {
         //Load data..
         RecordReader reader = new CSVRecordReader(0, ",");
 
-        reader.initialize(new FileSplit(new ClassPathResource("mid_noh_features4000.txt").getFile()));
+        reader.initialize(new FileSplit(new File("src/main/resources/mid_noh_features4000.txt")));
 
 
         log.info("Build model....");
@@ -104,7 +104,7 @@ public class BptiExample {
                 .iterations(iterations)
                 .constrainGradientToUnitNorm(true)
                 // .useDropConnect(true)
-                .learningRate(1e-1*5)
+                .learningRate(3e-1*8)
                 //.l1(0.3)
                 // .regularization(true).l2(1e-1)
                  //.momentum(0.5)
@@ -113,22 +113,22 @@ public class BptiExample {
                 .list(5)
                 .layer(0, new DenseLayer.Builder().nIn(numFeat).nOut(100)
                         .activation(activ).dropOut(0.5)
-                        .weightInit(WeightInit.NORMALIZED)
+                        .weightInit(WeightInit.VI)
                         .build())
                 .layer(1, new DenseLayer.Builder().nIn(100).nOut(75)       //300 200
                         .activation(activ)
-                        .weightInit(WeightInit.NORMALIZED)
+                        .weightInit(WeightInit.VI)
                         .build())
                  .layer(2, new DenseLayer.Builder().nIn(75).nOut(75)       //300 200
                          .activation(activ)
-                         .weightInit(WeightInit.NORMALIZED)
+                         .weightInit(WeightInit.VI)
                          .build())
                  .layer(3, new DenseLayer.Builder().nIn(75).nOut(50)       //300 200
                          .activation(activ)
-                         .weightInit(WeightInit.NORMALIZED)
+                         .weightInit(WeightInit.VI)
                          .build())
                 .layer(4, new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
-                        .weightInit(WeightInit.SIZE)
+                        .weightInit(WeightInit.VI)
                         .activation("softmax")
                         .nIn(50).nOut(outputNum).build())
                 .backprop(true).pretrain(true)
@@ -139,7 +139,7 @@ public class BptiExample {
         model.setListeners(Arrays.asList((IterationListener) new ScoreIterationListener(listenerFreq)));
 
         log.info("READING...");
-        DataSetIterator iter = new RecordReaderDataSetIterator(reader, 4000,15,5);
+        DataSetIterator iter = new RecordReaderDataSetIterator(reader, 4000,78,5);
         DataSet next = iter.next();
         next.normalizeZeroMeanZeroUnitVariance();
         log.info("Pre shuffle " + next.get(next.numExamples()-1));
@@ -147,7 +147,7 @@ public class BptiExample {
         //next.shuffle();
         log.info("Shuffle's last entry: " + next.get(next.numExamples()-1));
         log.info("Num of examples: " + String.valueOf(next.numExamples()));
-        trainTest = next.splitTestAndTrain(0.7);
+        trainTest = next.splitTestAndTrain(0.9);
         /////log.info("check iterate function: "+ trainTest.getTrain().iterateWithMiniBatches().totalExamples());
         //Train
         log.info("Train model....");
@@ -204,22 +204,20 @@ public class BptiExample {
         //log.info(labels.toString());
         //log.info(trainTest.getTest().getLabels().toString());
         //log.info(trainTest.getTrain().getLabels().toString());
+
         INDArray predict2 = model.output(trainTest.getTest().getFeatureMatrix());
         eval.eval(trainTest.getTest().getLabels(), predict2);
-
-
-        predict2 = model.output(trainTest.getTrain().getFeatureMatrix());
-        eval.eval(trainTest.getTrain().getLabels(), predict2);
-        log.info("********Test on Train************");
         log.info(eval.stats());
 
-        String stats = eval.stats();
-        log.info(stats);
+        log.info("********Test on Train************");
+        predict2 = model.output(trainTest.getTrain().getFeatureMatrix());
+        eval.eval(trainTest.getTrain().getLabels(), predict2);
+        log.info(eval.stats());
         //Save stats to file
         //PrintStream stream = new PrintStream(outputStats);
         //stream.println(stats);
-        FileUtils.write(new File(outputStats), stats);
-
+        //FileUtils.write(new File(outputStats), stats);
+/*
         //Save model to file
         OutputStream fos = Files.newOutputStream(Paths.get(outputModelWeights));
         DataOutputStream dos = new DataOutputStream(fos);
@@ -227,10 +225,10 @@ public class BptiExample {
         dos.flush();
         dos.close();
         FileUtils.write(new File(outputModelConf), model.getLayerWiseConfigurations().toJson());
-
+*/
         log.info("****************Example finished********************");
     }
-
+/*
     public static void registerOption(String option_name, String arg_name, boolean has_arg, String description) {
         OptionBuilder.withArgName(arg_name);
         OptionBuilder.hasArg(has_arg);
@@ -248,5 +246,5 @@ public class BptiExample {
 
         // Other options will be added here.
     }
-
+*/
 }

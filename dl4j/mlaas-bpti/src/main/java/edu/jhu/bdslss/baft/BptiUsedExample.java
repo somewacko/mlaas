@@ -45,8 +45,8 @@ public class BptiUsedExample {
         //              -input_model_weights_file [input weights file] -output_model_conf_file [output conf file]
         //              -output_model_weights_file [output weights file] -output_stats_file [stats file]
         // Parse the command line.
-        String[] mandatory_args = { "input_file", "output_model_conf_file",
-                "output_model_weights_file", "output_stats_file"};
+        String[] mandatory_args = { "input_file","input_model_conf_file","input_model_weights_file", "output_model_conf_file",
+                "output_model_weights_file"};//, "output_stats_file"};
         createCommandLineOptions();
         CommandLineUtilities.initCommandLineParameters(args, BptiExample.options, mandatory_args);
 
@@ -55,7 +55,7 @@ public class BptiUsedExample {
         String inputModelWeights = CommandLineUtilities.getOptionValue("input_model_weights_file");
         String outputModelConf = CommandLineUtilities.getOptionValue("output_model_conf_file");
         String outputModelWeights = CommandLineUtilities.getOptionValue("output_model_weights_file");
-        String outputStats = CommandLineUtilities.getOptionValue("output_stats_file");
+        //String outputStats = CommandLineUtilities.getOptionValue("output_stats_file");
 
         Nd4j.ENFORCE_NUMERICAL_STABILITY = true;
         final int numFeat = 15;//970;
@@ -63,7 +63,6 @@ public class BptiUsedExample {
 
         //int splitTrainNum = (int) (batchSize*.8);
         //DataSet mnist;
-        SplitTestAndTrain trainTest;
 
         //Load data..
         RecordReader reader = new CSVRecordReader(0, ",");
@@ -87,19 +86,15 @@ public class BptiUsedExample {
         DataSetIterator iter = new RecordReaderDataSetIterator(reader, 4000,numFeat,outputNum);
         DataSet next = iter.next();
         next.normalizeZeroMeanZeroUnitVariance();
-        log.info("Pre shuffle " + next.get(next.numExamples()-1));
-        log.info("Pre shuffle " + next.get(0));
-        //next.shuffle();
-        log.info("Shuffle's last entry: " + next.get(next.numExamples()-1));
-        log.info("Num of examples: " + String.valueOf(next.numExamples()));
-        trainTest = next.splitTestAndTrain(0.7);
         /////log.info("check iterate function: "+ trainTest.getTrain().iterateWithMiniBatches().totalExamples());
         //Train
         log.info("Train model....");
         //System.out.println(trainTest.getTrain().getFeatureMatrix().shape()[0]);
         ////model.fit(trainTest.getTrain().iterateWithMiniBatches());
-        model.fit(trainTest.getTrain());
+        model.fit(next);
 
+        //Doo not Evaluate
+        /*
         log.info("Evaluate model....");
         Evaluation eval = new Evaluation(outputNum);
 
@@ -121,6 +116,7 @@ public class BptiUsedExample {
         //PrintStream stream = new PrintStream(outputStats);
         //stream.println(stats);
         FileUtils.write(new File(outputStats), stats);
+        */
 
         //Save model to file
         OutputStream fos = Files.newOutputStream(Paths.get(outputModelWeights));
@@ -148,7 +144,7 @@ public class BptiUsedExample {
         registerOption("input_model_conf_file", "String", true, "The path to load the previous model conf from.");
         registerOption("output_model_weights_file", "String", true, "The path to save the computed model weights to.");
         registerOption("input_model_weights_file", "String", true, "The path to load the previous model weights from.");
-        registerOption("output_stats_file", "String", true, "The path to save the model stats to.");
+        //registerOption("output_stats_file", "String", true, "The path to save the model stats to.");
 
         // Other options will be added here.
     }
