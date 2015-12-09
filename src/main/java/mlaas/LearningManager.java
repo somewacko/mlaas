@@ -97,7 +97,7 @@ public class LearningManager {
 
 		Results results = new Results();
 		results.model = model;
-		results.accuracy = 100; // :D
+		results.accuracy = 100.00; // :D
 		return results;
 	}
 }

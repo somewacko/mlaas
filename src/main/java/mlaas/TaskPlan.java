@@ -1,6 +1,5 @@
 package mlaas;
 
-import mlaas.util.PowerSet;
 
 import java.util.*;
 
@@ -65,7 +64,7 @@ public class TaskPlan {
 
 		// Set up for best-first search
 
-		PriorityQueue<TaskNode> queue = new PriorityQueue<>(new TaskNodeComparator());
+		PriorityQueue<TaskNode> queue = new PriorityQueue<>(1, new TaskNodeComparator());
 
 		Map<Job, Task> terminatingTasks = new HashMap<Job, Task>(){{
 			for (Job job : jobGroup.getJobs())
