@@ -12,12 +12,16 @@ import java.util.Set;
  */
 abstract public class Task {
 
+	static int next_id = 0;
+
+	private int id;
+
 	private Set<Job> jobs;
 
 	private Task lastTask;
 	private Set<Task> nextTasks;
 
-	private Set<DataUnit> work;
+	private Set<DataUnit> work; // Either samples or features
 
 	private Job endJob;
 
@@ -45,6 +49,9 @@ abstract public class Task {
 
 		this.lastTask = null;
 		this.nextTasks = new HashSet<Task>();
+
+		this.id = Task.next_id;
+		Task.next_id += 1;
 	}
 
 	/**
@@ -66,6 +73,9 @@ abstract public class Task {
 	 * @return The appropriate work for this task.
 	 */
 	abstract protected Set<DataUnit> extractWork(Job job);
+
+	abstract public Set<DataFeature> getFeatures();
+	abstract public Set<DataSample> getSamples();
 
 	/**
 	 * Removes work from the task's set of work.
@@ -100,5 +110,9 @@ abstract public class Task {
 
 	public Job getEndJob() {
 		return this.endJob;
+	}
+
+	public int getId() {
+		return this.id;
 	}
 }
