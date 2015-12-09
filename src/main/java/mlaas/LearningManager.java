@@ -6,7 +6,7 @@ import java.util.*;
  * Manager for taking a job group, creating a task plan, and executing those tasks in DL4J/Spark accordingly.
  */
 public class LearningManager {
-	
+
 	private JobGroup jobGroup;
 	private TaskPlan taskPlan;
 
@@ -97,7 +97,7 @@ public class LearningManager {
 
 		Results results = new Results();
 		results.model = model;
-		results.accuracy = 100.00; // :D
+		results.accuracy = new Double(100); // :D
 		return results;
 	}
 }
