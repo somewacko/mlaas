@@ -1,25 +1,29 @@
 package mlaas;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 
 public class JobQueue {
 	ArrayList<Job> jobs = new ArrayList<Job>();
 
-	public void addJob(Job job)
-	{
-		
+	public void addJob(Job job){
+		this.jobs.add(job);
 	}
-	
-	public void findSimilarJobs(Job job)
-	{
-		
+
+	public ArrayList<Job> getJobList(){
+		return this.jobs;
 	}
-	
-	public JobGroup groupJobs(ArrayList<Job> jobs)
-	{
-		return null;
+	public void removeJobs(ArrayList<Job> jobsToBeRemoved){
+		this.jobs.removeAll(jobsToBeRemoved);
 	}
-	
+
+
+	public ArrayList<Job> findSimilarJobs(Job job){
+	}
+
+	public JobGroup groupJobs(ArrayList<Job> jobs, JobGroupType type){
+		JobGroup jobGroup = new JobGroup(jobs, type);
+		return jobGroup;
+	}
 }
-
-

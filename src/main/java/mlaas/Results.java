@@ -1,8 +1,9 @@
 package mlaas;
 
-import java.io.*;
-
+/**
+ * Wrapper class for learning results.
+ */
 public class Results {
-
-	File resultsFile= new File("results.txt");
+	public DNNModel model;
+	public Double accuracy;
 }

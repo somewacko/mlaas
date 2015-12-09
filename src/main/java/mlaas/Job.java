@@ -14,6 +14,8 @@ public class Job {
 	private Set<DataFeature> features;
 	private JobStatus status = JobStatus.Waiting;
 
+	private Results results;
+
 	/**
 	 * Constructor for a Job with given specifications.
 	 * @param dataSet The data set for this job to train on.
@@ -25,6 +27,27 @@ public class Job {
 		this.samples = new HashSet<>(samples);
 		this.features = new HashSet<>(features);
 	}
+
+	/**
+	 * Sets results from the learning task.
+	 * @param results The classification results.
+	 */
+	public void saveLearningResults(Results results) {
+		this.results = results;
+
+		// TODO: Save model and results, return to user.
+
+		this.status = JobStatus.Finished;
+	}
+
+	/**
+	 * Indicates that there was an error while learning.
+	 */
+	public void markError() {
+		this.status = JobStatus.Error;
+	}
+
+	// Getters and Setters
 
 	public DataSet getDataSet() { return this.dataSet; }
 	public Set<DataSample> getSamples() { return this.samples; }

@@ -1,5 +1,9 @@
 package edu.jhu.bdslss.baft;
 
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -32,20 +36,46 @@ import org.slf4j.LoggerFactory;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedList;
 
 /**
  * Created by Aileme on 11/16/15.
  */
 public class BptiSparkExample {
     private static Logger log = LoggerFactory.getLogger(BptiSparkExample.class);
+    static public LinkedList<Option> options = new LinkedList<Option>();
 
     public static void main(String[] args) throws Exception {
 
         // set to test mode
         SparkConf sparkConf = new SparkConf().set(SparkDl4jMultiLayer.AVERAGE_EACH_ITERATION, "false")
                 .setAppName("sparktest");
+
+        // To run:
+        // BptiSparkExample -input_file [input file] -output_model_conf_file [output conf file]
+        //              -output_model_weights_file [output weights file -output_stats_file [stats file]
+        // Parse the command line.
+        String[] mandatory_args = { "input_file", "output_model_conf_file",
+                "output_model_weights_file", "output_stats_file"};
+        createCommandLineOptions();
+        CommandLineUtilities.initCommandLineParameters(args, BptiExample.options, mandatory_args);
+
+        String inputFile = CommandLineUtilities.getOptionValue("input_file");
+        if(StringUtils.isBlank(inputFile)) throw new Exception("Please specify input file");
+
+        String outputModelConf = CommandLineUtilities.getOptionValue("output_model_conf_file");
+        if(StringUtils.isBlank(outputModelConf)) throw new Exception("Please specify model config output file");
+
+        String outputModelWeights = CommandLineUtilities.getOptionValue("output_model_weights_file");
+        if(StringUtils.isBlank(outputModelWeights)) throw new Exception("Please specify model weights output file");
+
+        String outputStats = CommandLineUtilities.getOptionValue("output_stats_file");
+        if(StringUtils.isBlank(outputStats)) throw new Exception("Please specify stats output file");
 
         Nd4j.ENFORCE_NUMERICAL_STABILITY = true;
         final int numFeat = 15;    //15;
@@ -60,10 +90,8 @@ public class BptiSparkExample {
         //Load data..
         RecordReader reader = new CSVRecordReader(0, ",");
 
-
         reader.initialize(new FileSplit(new File("src/main/resources/mid_features4000.txt")));
-///local/bdslss15-baft/resources/avg_features4000.txt
-        //src/main/resources/pca_features4000.txt
+
         //log.info("Build model....");
         JavaSparkContext sc = new JavaSparkContext(sparkConf);
         String activation = "tanh";
@@ -122,11 +150,6 @@ public class BptiSparkExample {
         log.info("Train model....");
         // for checking shuffle
         MultiLayerNetwork network2 = master.fitDataSet(data);
-        FileOutputStream fos  = new FileOutputStream("params.txt");
-        DataOutputStream dos = new DataOutputStream(fos);
-        Nd4j.write(dos, network2.params());
-        dos.flush();
-        dos.close();
 
         log.info("Evaluate model....");
         Evaluation eval = new Evaluation(outputNum);
@@ -137,6 +160,40 @@ public class BptiSparkExample {
         eval.eval(trainTest.getTest().getLabels(), predict2);
 
         System.out.println(eval.stats());
-        System.out.println("****************Example finished********************");
+
+        String stats = eval.stats();
+        log.info(stats);
+        //Save stats to file
+        //PrintStream stream = new PrintStream(outputStats);
+        //stream.println(stats);
+        FileUtils.write(new File(outputStats), stats);
+
+        //Save model to file
+        OutputStream fos = Files.newOutputStream(Paths.get(outputModelWeights));
+        DataOutputStream dos = new DataOutputStream(fos);
+        Nd4j.write(model.params(), dos);
+        dos.flush();
+        dos.close();
+        FileUtils.write(new File(outputModelConf), model.getLayerWiseConfigurations().toJson());
+
+        log.info("****************Example finished********************");
+    }
+
+    public static void registerOption(String option_name, String arg_name, boolean has_arg, String description) {
+        OptionBuilder.withArgName(arg_name);
+        OptionBuilder.hasArg(has_arg);
+        OptionBuilder.withDescription(description);
+        Option option = OptionBuilder.create(option_name);
+
+        BptiExample.options.add(option);
+    }
+
+    private static void createCommandLineOptions() {
+        registerOption("input_file", "String", true, "The path to the input file.");
+        registerOption("output_model_conf_file", "String", true, "The path to save the computed model conf to.");
+        registerOption("output_model_weights_file", "String", true, "The path to save the computed model weights to.");
+        registerOption("output_stats_file", "String", true, "The path to save the model stats to.");
+
+        // Other options will be added here.
     }
 }
