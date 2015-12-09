@@ -20,6 +20,7 @@ public class JobQueue {
 
 
 	public ArrayList<Job> findSimilarJobs(Job job){
+		return null;
 	}
 
 	public JobGroup groupJobs(ArrayList<Job> jobs, JobGroupType type){

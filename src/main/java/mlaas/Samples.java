@@ -29,7 +29,6 @@ public class Samples extends DataSample{
 		return null;
 	}
 
-	@Override
 	public Integer getSampleNumber() {
 		// TODO Auto-generated method stub
 		return sampleNumber;
