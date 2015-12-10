@@ -37,8 +37,6 @@ public class VelocityTemplateEngine extends TemplateEngine {
     /**
      * Constructor
      */
-
-    /*
     public VelocityTemplateEngine() {
         Properties properties = new Properties();
         properties.setProperty("resource.loader", "class");
@@ -77,4 +75,5 @@ public class VelocityTemplateEngine extends TemplateEngine {
             throw new IllegalArgumentException("modelAndView must be of type java.util.Map");
         }
     }
+
 }
