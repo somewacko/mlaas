@@ -1,6 +1,5 @@
 package mlaas;
 
-import mlaas.bpti.*;
 import mlaas.generic.*;
 
 import java.util.*;
@@ -126,7 +125,7 @@ public class TestTaskPlan {
 		JobGroup jobGroup = new JobGroup(jobs, JobGroupType.SharedSamples);
 		TaskPlan taskPlan = new TaskPlan(jobGroup);
 
-		//printTaskPlan(taskPlan);
+		printTaskPlan(taskPlan);
 
 		assertTrue( verifyTaskPlan(taskPlan, jobGroup) );
 	}
@@ -163,7 +162,7 @@ public class TestTaskPlan {
 		JobGroup jobGroup = new JobGroup(jobs, JobGroupType.SharedSamples);
 		TaskPlan taskPlan = new TaskPlan(jobGroup);
 
-		//printTaskPlan(taskPlan);
+		printTaskPlan(taskPlan);
 
 		assertTrue( verifyTaskPlan(taskPlan, jobGroup) );
 	}
@@ -200,7 +199,7 @@ public class TestTaskPlan {
 		JobGroup jobGroup = new JobGroup(jobs, JobGroupType.SharedSamples);
 		TaskPlan taskPlan = new TaskPlan(jobGroup);
 
-		//printTaskPlan(taskPlan);
+		printTaskPlan(taskPlan);
 
 		assertTrue( verifyTaskPlan(taskPlan, jobGroup) );
 	}
@@ -243,7 +242,7 @@ public class TestTaskPlan {
 		JobGroup jobGroup = new JobGroup(jobs, JobGroupType.SharedSamples);
 		TaskPlan taskPlan = new TaskPlan(jobGroup);
 
-		//printTaskPlan(taskPlan);
+		printTaskPlan(taskPlan);
 
 		assertTrue( verifyTaskPlan(taskPlan, jobGroup) );
 	}
@@ -307,7 +306,139 @@ public class TestTaskPlan {
 		JobGroup jobGroup = new JobGroup(jobs, JobGroupType.SharedSamples);
 		TaskPlan taskPlan = new TaskPlan(jobGroup);
 
-		//printTaskPlan(taskPlan);
+		printTaskPlan(taskPlan);
+
+		assertTrue( verifyTaskPlan(taskPlan, jobGroup) );
+	}
+
+	@Test
+	public void testMoreComplexCase2() {
+
+		final List<DataFeature> commonFeatures = new ArrayList<DataFeature>(){{
+			add(new TestFeature(0));
+		}};
+
+		final List<DataSample> samples1 = new ArrayList<DataSample>(){{
+			add(new TestSample(1));
+			add(new TestSample(2));
+		}};
+		final List<DataSample> samples2 = new ArrayList<DataSample>(){{
+			add(new TestSample(4));
+			add(new TestSample(5));
+		}};
+		final List<DataSample> samples3 = new ArrayList<DataSample>(){{
+			add(new TestSample(7));
+			add(new TestSample(8));
+		}};
+		final List<DataSample> samples4 = new ArrayList<DataSample>(){{
+			add(new TestSample(2));
+			add(new TestSample(7));
+		}};
+		final List<DataSample> samples5 = new ArrayList<DataSample>(){{
+			add(new TestSample(4));
+			add(new TestSample(2));
+		}};
+		final List<DataSample> samples6 = new ArrayList<DataSample>(){{
+			add(new TestSample(2));
+			add(new TestSample(7));
+			add(new TestSample(8));
+			add(new TestSample(10));
+		}};
+		final List<DataSample> samples7 = new ArrayList<DataSample>(){{
+			add(new TestSample(1));
+			add(new TestSample(2));
+			add(new TestSample(3));
+		}};
+		final List<DataSample> samples8 = new ArrayList<DataSample>(){{
+			add(new TestSample(1));
+			add(new TestSample(4));
+			add(new TestSample(8));
+			add(new TestSample(9));
+		}};
+
+		List<Job> jobs = new ArrayList<Job>(){{
+			add(new Job(DataSet.None, new ArrayList<DataSample>(){{
+				add(new TestSample(1));
+			}}, commonFeatures));
+			add(new Job(DataSet.None, new ArrayList<DataSample>(){{
+				add(new TestSample(1));
+				add(new TestSample(2));
+			}}, commonFeatures));
+			add(new Job(DataSet.None, new ArrayList<DataSample>(){{
+				add(new TestSample(1));
+				add(new TestSample(2));
+				add(new TestSample(3));
+			}}, commonFeatures));
+			add(new Job(DataSet.None, new ArrayList<DataSample>(){{
+				add(new TestSample(1));
+				add(new TestSample(2));
+				add(new TestSample(3));
+				add(new TestSample(4));
+			}}, commonFeatures));
+			add(new Job(DataSet.None, new ArrayList<DataSample>(){{
+				add(new TestSample(1));
+				add(new TestSample(2));
+				add(new TestSample(3));
+				add(new TestSample(4));
+				add(new TestSample(5));
+			}}, commonFeatures));
+			add(new Job(DataSet.None, new ArrayList<DataSample>(){{
+				add(new TestSample(2));
+				add(new TestSample(3));
+				add(new TestSample(4));
+				add(new TestSample(5));
+				add(new TestSample(6));
+			}}, commonFeatures));
+			add(new Job(DataSet.None, new ArrayList<DataSample>(){{
+				add(new TestSample(2));
+				add(new TestSample(4));
+				add(new TestSample(6));
+				add(new TestSample(8));
+			}}, commonFeatures));
+			add(new Job(DataSet.None, new ArrayList<DataSample>(){{
+				add(new TestSample(3));
+				add(new TestSample(5));
+				add(new TestSample(7));
+				add(new TestSample(9));
+				add(new TestSample(10));
+			}}, commonFeatures));
+			add(new Job(DataSet.None, new ArrayList<DataSample>(){{
+				add(new TestSample(2));
+				add(new TestSample(5));
+				add(new TestSample(3));
+				add(new TestSample(9));
+				add(new TestSample(8));
+			}}, commonFeatures));
+			add(new Job(DataSet.None, new ArrayList<DataSample>(){{
+				add(new TestSample(4));
+				add(new TestSample(8));
+			}}, commonFeatures));
+			add(new Job(DataSet.None, new ArrayList<DataSample>(){{
+				add(new TestSample(5));
+				add(new TestSample(4));
+				add(new TestSample(3));
+			}}, commonFeatures));
+			add(new Job(DataSet.None, new ArrayList<DataSample>(){{
+				add(new TestSample(8));
+				add(new TestSample(9));
+				add(new TestSample(7));
+			}}, commonFeatures));
+			add(new Job(DataSet.None, new ArrayList<DataSample>(){{
+				add(new TestSample(1));
+				add(new TestSample(5));
+				add(new TestSample(9));
+			}}, commonFeatures));
+			add(new Job(DataSet.None, new ArrayList<DataSample>(){{
+				add(new TestSample(4));
+				add(new TestSample(3));
+				add(new TestSample(2));
+			}}, commonFeatures));
+		}};
+
+		JobGroup jobGroup = new JobGroup(jobs, JobGroupType.SharedSamples);
+		TaskPlan taskPlan = new TaskPlan(jobGroup);
+
+		printTaskPlan(taskPlan);
 
 		assertTrue( verifyTaskPlan(taskPlan, jobGroup) );
 	}
@@ -315,7 +446,7 @@ public class TestTaskPlan {
 	@Test
 	public void testLargeGroup() {
 
-		final int numJobs = 10;
+		final int numJobs = 20;
 		final int numWork = 1000;
 		final double variance = 50;
 

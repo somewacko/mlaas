@@ -148,7 +148,7 @@ public class TaskPlanStats {
 		int numJobs = 100;
 		int numWork = 1000;
 
-		List<Double> variances = Arrays.asList(0.1, 1., 5., 10., 15., 20., 25.);
+		List<Double> variances = Arrays.asList(0.1, 1., 5., 10., 15., 20., 25., 35., 50., 75., 100.);
 
 		for (double variance : variances) {
 

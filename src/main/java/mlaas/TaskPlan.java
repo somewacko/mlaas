@@ -11,6 +11,36 @@ public class TaskPlan {
 	private List<Task> startingTasks;
 	private Map<Job, Task> terminatingTasks;
 
+	// Class to represent a node in the task plan - contains the task associated for the node and all of the
+	// remaining work that still has to be done for that node.
+	class TaskNode {
+		Task task;
+		Map<Job, List<Task>> remainingTasks;
+		int distance = Integer.MAX_VALUE;
+
+		public TaskNode(Task task, Map<Job, List<Task>> remainingTasks) {
+			this.task = task;
+			this.remainingTasks = remainingTasks;
+
+			for (List<Task> list : this.remainingTasks.values())
+				this.distance = Math.min(list.size(), this.distance);
+		}
+	}
+
+	// Comparator for priority queue for best-first search, using the distance from a terminating node as the
+	// primary heuristic.
+	class TaskNodeComparator implements Comparator<TaskNode> {
+		@Override
+		public int compare(TaskNode x, TaskNode y) {
+			if (x.distance < y.distance)
+				return -1;
+			else if (x.distance > y.distance)
+				return 1;
+			else
+				return 0;
+		}
+	}
+
 	/**
 	 * Constructor for TaskPlan with a given JobGroup.
 	 * @param jobGroup The job group to create a task plan from.
@@ -20,64 +50,31 @@ public class TaskPlan {
 	}
 
 
+	static int count = 0;
+
 	/**
 	 * Generates the logical plan based on the current tasks.
 	 * @param jobGroup The job group to create a task plan from.
 	 */
 	private void generateTaskPlan(final JobGroup jobGroup) throws RuntimeException {
 
-		// Set up helper classes
+		List<List<Task>> subGroups = this.findSubGroups(jobGroup);
 
-		// Class to represent a node in the task plan - contains the task associated for the node and all of the
-		// remaining work that still has to be done for that node.
-		class TaskNode {
-			Task task;
-			Map<Job, List<Task>> remainingTasks;
-			int distance = Integer.MAX_VALUE;
+		// Find starting tasks
 
-			public TaskNode(Task task, Map<Job, List<Task>> remainingTasks) {
-				this.task = task;
-				this.remainingTasks = remainingTasks;
-
-				for (List<Task> list : this.remainingTasks.values())
-					this.distance = Math.min(list.size(), this.distance);
-			}
-		}
-
-		// Comparator for priority queue for best-first search, using the distance from a terminating node as the
-		// primary heuristic.
-		class TaskNodeComparator implements Comparator<TaskNode> {
-			@Override
-			public int compare(TaskNode x, TaskNode y) {
-				if (x.distance < y.distance)
-					return -1;
-				else if (x.distance > y.distance)
-					return 1;
-				else
-					return 0;
-			}
-		}
-
-		// Get all tasks with common work
-
-		List<Task> tasks = this.findCommonTasks(jobGroup);
-
-		// Set up for best-first search
-
-		PriorityQueue<TaskNode> queue = new PriorityQueue<>(1, new TaskNodeComparator());
-
-		Map<Job, Task> terminatingTasks = new HashMap<Job, Task>(){{
+		this.terminatingTasks = new HashMap<Job, Task>(){{
 			for (Job job : jobGroup.getJobs())
 				put(job, null);
 		}};
 
-		// Find starting tasks
-
+		List<TaskNode> startingNodes = new LinkedList<>();
 		List<Task> startingTasks = new LinkedList<>();
-		Set<Job> jobsLeft = new HashSet<>(jobGroup.getJobs());
 
-		for (Task currentTask : tasks) {
-			Task task = TaskFactory.createTask(currentTask);
+		for (List<Task> tasks : subGroups) {
+
+			Task startingTask = tasks.get(0);
+
+			Task task = TaskFactory.createTask(startingTask);
 
 			Map<Job, List<Task>> remainingTasks = new HashMap<>();
 
@@ -86,83 +83,29 @@ public class TaskPlan {
 				remainingTasks.put(job, new LinkedList<Task>());
 
 				for (Task t : tasks)
-					if (t != currentTask && t.getJobs().contains(job))
+					if (t != startingTask && t.getJobs().contains(job))
 						remainingTasks.get(job).add(t);
-
-				jobsLeft.remove(job);
 			}
 
-			queue.add(new TaskNode(task, remainingTasks));
+			startingNodes.add(new TaskNode(task, remainingTasks));
 			startingTasks.add(task);
-
-			if (jobsLeft.isEmpty())
-				break;
 		}
 
 		// Perform best-first search
 
-		while (!queue.isEmpty()) {
-
-			TaskNode node = queue.remove();
-
-			Task task = node.task;
-			Map<Job, List<Task>> remainingTasks = node.remainingTasks;
-
-			if (task.getEndJob() != null) {
-				if (terminatingTasks.get(task.getEndJob()) == null) {
-					terminatingTasks.put(task.getEndJob(), task);
-				}
-			}
-			else {
-				for (Job job : task.getJobs()) {
-
-					if (remainingTasks.keySet().contains(job) && terminatingTasks.get(job) == null) {
-
-						List<Task> tasksForJob = remainingTasks.get(job);
-
-						Task nextTask = tasksForJob.get(0);
-
-						Task newTask = TaskFactory.createTask(nextTask);
-
-						task.addNextTask(newTask);
-						newTask.setLastTask(task);
-
-						// If the next task is terminating but has no associated work, set this as a terminating task
-						// immediately (since the current task is effectively the terminating task for this job).
-						if (newTask.getEndJob() != null && newTask.getWork().isEmpty()) {
-							if (terminatingTasks.get(newTask.getEndJob()) == null)
-								terminatingTasks.put(newTask.getEndJob(), newTask);
-							continue;
-						}
-
-						// Copy over remaining tasks, sans the next task.
-
-						Map<Job, List<Task>> newRemainingTasks = new HashMap<>();
-
-						for (Job j : newTask.getJobs()) {
-							if (remainingTasks.keySet().contains(j)) {
-								newRemainingTasks.put(j, new LinkedList<Task>());
-
-								for (Task t : remainingTasks.get(j)) {
-									if (t != nextTask)
-										newRemainingTasks.get(j).add(t);
-								}
-							}
-						}
-
-						// Add to queues
-
-						queue.add(new TaskNode(newTask, newRemainingTasks));
-					}
-				}
-			}
+		for (TaskNode node : startingNodes) {
+			this.findPaths(node);
 		}
 
-		// From the terminating tasks, bubble up the tree and color all tasks along the way to mark which ones are
-		// valid.
 
-		for (Job job : terminatingTasks.keySet()) {
-			Task task = terminatingTasks.get(job);
+
+		System.out.printf("(Num iterations: %d)\n", count);
+
+		// From the terminating tasks, bubble up the tree and color all tasks along the way to mark which ones are
+		// valid
+
+		for (Job job : this.terminatingTasks.keySet()) {
+			Task task = this.terminatingTasks.get(job);
 			task.isValid = true;
 
 			while (task.getLastTask() != null) {
@@ -186,7 +129,113 @@ public class TaskPlan {
 		// We're done! Return the starting tasks.
 
 		this.startingTasks = startingTasks;
-		this.terminatingTasks = terminatingTasks;
+	}
+
+
+	/**
+	 *
+	 */
+	private void findPaths(TaskNode node) {
+
+		count += 1;
+
+		Task task = node.task;
+		Map<Job, List<Task>> remainingTasks = node.remainingTasks;
+
+		if (task.getEndJob() != null) {
+			if (terminatingTasks.get(task.getEndJob()) == null) {
+				terminatingTasks.put(task.getEndJob(), task);
+			}
+		}
+		else {
+
+			// Insertion sort Jobs based on how much work is left
+
+			List<Job> sortedJobs = new LinkedList<>();
+
+			for (Job job : task.getJobs()) {
+
+				if (remainingTasks.keySet().contains(job) && terminatingTasks.get(job) == null) {
+					ListIterator<Job> iter = sortedJobs.listIterator();
+					while (iter.hasNext())
+						if (remainingTasks.get(job).size() < remainingTasks.get(iter.next()).size())
+							break;
+					sortedJobs.add(iter.nextIndex(), job);
+				}
+			}
+
+			for (Job job : sortedJobs) {
+
+				if (terminatingTasks.get(job) == null) {
+
+					List<Task> tasksForJob = remainingTasks.get(job);
+
+					Task nextTask = tasksForJob.get(0);
+
+					Task newTask = TaskFactory.createTask(nextTask);
+
+					task.addNextTask(newTask);
+					newTask.setLastTask(task);
+
+					// If the next task is terminating but has no associated work, set this as a terminating task
+					// immediately (since the current task is effectively the terminating task for this job).
+					if (newTask.getEndJob() != null && newTask.getWork().isEmpty()) {
+						if (terminatingTasks.get(newTask.getEndJob()) == null)
+							terminatingTasks.put(newTask.getEndJob(), newTask);
+						continue;
+					}
+
+					// Copy over remaining tasks, sans the next task.
+
+					Map<Job, List<Task>> newRemainingTasks = new HashMap<>();
+
+					for (Job j : newTask.getJobs()) {
+						if (remainingTasks.keySet().contains(j)) {
+							newRemainingTasks.put(j, new LinkedList<Task>());
+
+							for (Task t : remainingTasks.get(j)) {
+								if (t != nextTask)
+									newRemainingTasks.get(j).add(t);
+							}
+						}
+					}
+
+					// Continue down this path
+
+					this.findPaths(new TaskNode(newTask, newRemainingTasks));
+				}
+			}
+		}
+	}
+
+
+	/**
+	 * Finds subgroups within a job group.
+	 * @param jobGroup
+	 * @return
+	 */
+	private List<List<Task>> findSubGroups(JobGroup jobGroup) {
+
+		List<List<Task>> subGroups = new ArrayList<>();
+
+
+		List<Job> jobsLeft = new ArrayList<>(jobGroup.getJobs());
+
+		while (!jobsLeft.isEmpty()) {
+
+			JobGroup jobsLeftGroup = new JobGroup(jobsLeft, jobGroup.getType());
+
+			Task task = this.findCommonTasks(jobsLeftGroup).get(0);
+
+			jobsLeft.removeAll(task.getJobs());
+
+			JobGroup subGroup = new JobGroup(task.getJobs(), jobGroup.getType());
+			List<Task> tasks = this.findCommonTasks(subGroup);
+			this.pruneTasks(tasks);
+			subGroups.add(tasks);
+		}
+
+		return subGroups;
 	}
 
 
@@ -257,6 +306,16 @@ public class TaskPlan {
 			}
 		});
 
+
+		return tasks;
+	}
+
+	/**
+	 * Makes work unique to each job, removing tasks that have no work.
+	 * @param tasks
+	 */
+	private void pruneTasks(List<Task> tasks) {
+
 		// Starting from the top, remove all work in the current task from smaller-sized tasks
 
 		for (ListIterator<Task> outerIter = tasks.listIterator(); outerIter.hasNext(); ) {
@@ -276,8 +335,6 @@ public class TaskPlan {
 					add(task);
 			}
 		}});
-
-		return tasks;
 	}
 
 

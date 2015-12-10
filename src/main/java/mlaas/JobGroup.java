@@ -7,7 +7,7 @@ import java.util.*;
  */
 public class JobGroup {
 
-	private List<Job> jobs; 	// The list of jobs in this group
+	private Collection<Job> jobs; 	// The list of jobs in this group
 	private JobGroupType type;	// The type of group this is
 
 	/**
@@ -15,7 +15,7 @@ public class JobGroup {
 	 * @param jobs the set of jobs in this job group.
 	 * @param type the type of job group that this is.
 	 */
-	public JobGroup(List<Job> jobs, JobGroupType type) {
+	public JobGroup(Collection<Job> jobs, JobGroupType type) {
 		this.jobs = jobs;
 		this.type = type;
 	};
@@ -56,6 +56,6 @@ public class JobGroup {
 
 	// Getters and setters
 
-	public List<Job> getJobs() { return this.jobs; }
+	public Collection<Job> getJobs() { return this.jobs; }
 	public JobGroupType getType() { return this.type; }
 }
