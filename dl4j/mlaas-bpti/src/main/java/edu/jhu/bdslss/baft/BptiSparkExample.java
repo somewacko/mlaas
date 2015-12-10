@@ -60,7 +60,7 @@ public class BptiSparkExample {
         // BptiSparkExample -input_file [input file] -output_model_conf_file [output conf file]
         //              -output_model_weights_file [output weights file -output_stats_file [stats file]
         // Parse the command line.
-        String[] mandatory_args = { "input_file", "output_model_conf_file",
+        /*String[] mandatory_args = { "input_file", "output_model_conf_file",
                 "output_model_weights_file"};   //, "output_stats_file"};
         createCommandLineOptions();
         CommandLineUtilities.initCommandLineParameters(args, BptiExample.options, mandatory_args);
@@ -76,9 +76,9 @@ public class BptiSparkExample {
 
         String outputStats = CommandLineUtilities.getOptionValue("output_stats_file");
         if(StringUtils.isBlank(outputStats)) throw new Exception("Please specify stats output file");
-
+*/
         Nd4j.ENFORCE_NUMERICAL_STABILITY = true;
-        final int numFeat = 15;    //15;
+        final int numFeat = 970;    //15;
         int outputNum = 5;
         int numSamples = 4000;
         int iterations = 40;
@@ -154,32 +154,28 @@ public class BptiSparkExample {
         log.info("Evaluate model....");
         Evaluation eval = new Evaluation(outputNum);
 
-        log.info("Predictions---");
         INDArray predict2 = network2.output(trainTest.getTest().getFeatureMatrix());
 
         eval.eval(trainTest.getTest().getLabels(), predict2);
 
-        System.out.println(eval.stats());
-
-        String stats = eval.stats();
-        log.info(stats);
+        log.info(eval.stats());
         //Save stats to file
         //PrintStream stream = new PrintStream(outputStats);
         //stream.println(stats);
-        FileUtils.write(new File(outputStats), stats);
+        //FileUtils.write(new File(outputStats), stats);
 
         //Save model to file
-        OutputStream fos = Files.newOutputStream(Paths.get(outputModelWeights));
-        DataOutputStream dos = new DataOutputStream(fos);
-        Nd4j.write(model.params(), dos);
-        dos.flush();
-        dos.close();
-        FileUtils.write(new File(outputModelConf), model.getLayerWiseConfigurations().toJson());
+        //OutputStream fos = Files.newOutputStream(Paths.get(outputModelWeights));
+        //DataOutputStream dos = new DataOutputStream(fos);
+        //Nd4j.write(model.params(), dos);
+        //dos.flush();
+        //dos.close();
+        //FileUtils.write(new File(outputModelConf), model.getLayerWiseConfigurations().toJson());
 
         log.info("****************Example finished********************");
     }
 
-    public static void registerOption(String option_name, String arg_name, boolean has_arg, String description) {
+  /*  public static void registerOption(String option_name, String arg_name, boolean has_arg, String description) {
         OptionBuilder.withArgName(arg_name);
         OptionBuilder.hasArg(has_arg);
         OptionBuilder.withDescription(description);
@@ -195,5 +191,5 @@ public class BptiSparkExample {
         registerOption("output_stats_file", "String", true, "The path to save the model stats to.");
 
         // Other options will be added here.
-    }
+    }*/
 }

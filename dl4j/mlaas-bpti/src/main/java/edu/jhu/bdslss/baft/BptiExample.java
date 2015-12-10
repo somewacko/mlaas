@@ -65,7 +65,7 @@ public class BptiExample {
         int outputNum = 5;
         //int numSamples =1000;
         //int batchSize = 20;
-        int iterations =20;
+        int iterations =40;
         int seed = 123;
         int listenerFreq = iterations/5;
         //int splitTrainNum = (int) (batchSize*.8);
@@ -78,7 +78,8 @@ public class BptiExample {
         //Load data..
         RecordReader reader = new CSVRecordReader(0, ",");
 
-        reader.initialize(new FileSplit(new File("src/main/resources/mid_noh_features4000.txt")));
+        //reader.initialize(new FileSplit(new File("src/main/resources/mid_noh_features4000.txt")));
+        reader.initialize(new FileSplit(new File("src/main/resources/window_features4000.txt")));
 
 
         log.info("Build model....");
@@ -104,9 +105,9 @@ public class BptiExample {
                 .iterations(iterations)
                 .constrainGradientToUnitNorm(true)
                 // .useDropConnect(true)
-                .learningRate(3e-1*8)
-                //.l1(0.3)
-                // .regularization(true).l2(1e-1)
+                .learningRate(1e-1*5)
+                .l1(0.3)
+                .regularization(true).l2(1e-1)
                  //.momentum(0.5)
                  //.momentumAfter(Collections.singletonMap(3, 0.9))
                  .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
@@ -139,7 +140,7 @@ public class BptiExample {
         model.setListeners(Arrays.asList((IterationListener) new ScoreIterationListener(listenerFreq)));
 
         log.info("READING...");
-        DataSetIterator iter = new RecordReaderDataSetIterator(reader, 5,78,5);
+        DataSetIterator iter = new RecordReaderDataSetIterator(reader, 76000,78,5);
         log.info(" bring from iterator");
         DataSet next = iter.next();
         log.info("Done reading");
@@ -149,7 +150,7 @@ public class BptiExample {
         //next.shuffle();
         log.info("Shuffle's last entry: " + next.get(next.numExamples()-1));
         log.info("Num of examples: " + String.valueOf(next.numExamples()));
-        trainTest = next.splitTestAndTrain(0.9);
+        trainTest = next.splitTestAndTrain(0.8);
         /////log.info("check iterate function: "+ trainTest.getTrain().iterateWithMiniBatches().totalExamples());
         //Train
         log.info("Train model....");

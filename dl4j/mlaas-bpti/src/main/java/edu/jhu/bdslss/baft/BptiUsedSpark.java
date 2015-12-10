@@ -86,6 +86,7 @@ public class BptiUsedSpark {
         DataInputStream dis = new DataInputStream(new FileInputStream(inputModelWeights));
         INDArray newParams = Nd4j.read(dis);
         dis.close();
+        confFromJson.getConf(0).setBatchSize(numSamples/2);
         MultiLayerNetwork model = new MultiLayerNetwork(confFromJson);
         model.init();
         model.setParameters(newParams);
