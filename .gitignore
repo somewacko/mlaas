@@ -13,3 +13,15 @@ target/
 # Large JAR
 DL4JSparkJAR/
 
+#Features files
+data/
+data/features/
+
+# IntelliJ
+*.iml
+
+#Gradle
+.gradle/
+
+#build
+build/
