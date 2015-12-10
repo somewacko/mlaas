@@ -1,13 +1,14 @@
 <h2>&nbsp &nbsp Fill the following fields and click submit.</h2>
 <form action='/submitted'>
   <div class="container">
+    <label for="filename">Enter File Name:</label>
+    <input id="filename" name="filename" class="container" type="text" value="window_features4000.txt">  <br>
     <label for="dataset">Choose dataset</label>
     <input id = "dataset" type="radio" name="dataset" value="bpti" checked style="margin-left: 0">BPTI<br><br>
-    <label for="samples">Enter Samples (1-4000) :</label>
+    <label for="samples">Enter Samples :</label>
     <input id="samples" name="samples" class="container" type="text"><br><br>
-    <label for="features">Enter Features (1-15) :</label>
-    <input id="features" name="features" class="container" type="text" value="1-15">
-  <br>
+    <label for="features">Enter Features :</label>
+    <input id="features" name="features" class="container" type="text">
   <button type="submit" class="btn">Submit!</button>
   </div>
 </form>
