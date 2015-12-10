@@ -57,17 +57,20 @@ public class LearningManager {
 	 */
 	private void executeTask(Task task, DNNModel model){
 
-		DNNModel newModel = null;
+		DNNModel newModel = model;
 
-		if (!task.getWork().isEmpty())
+		if (!task.getWork().isEmpty()){
+			System.out.println("Entering first if");
 			newModel = runSparkTrainingJob(task, model);
-
+		}
 		if (!task.getNextTasks().isEmpty()) {
+			System.out.println("Entering second if");
+
 			for (Task nextTask : task.getNextTasks())
 				executeTask(nextTask, newModel);
 		}
 		else {
-			Results results = evaluateSparkModel(task.getEndJob(), newModel);
+			Results results = evaluateSparkModel(task.getEndJob(), model);
 			task.getEndJob().saveLearningResults(results);
 		}
 	}
@@ -88,7 +91,7 @@ public class LearningManager {
 			String outputModelConf = "/local/BigData/Models/model"+task.getId()+" ";
 			String outputModelWeights = "/local/BigData/Models/weight"+task.getId()+" ";
 			//String outputStats = " ";
-			String command=sparkPath+" --class edu.jhu.bdslss.baft.BptiSparkTrain DL4JSparkJAR/MLAAS-1.0-SNAPSHOT.jar" +
+			String command=sparkPath+" --class edu.jhu.bdslss.baft.BptiSparkTrain DL4JSparkJAR/MLAAS-1.0-SNAPSHOT.jar " +
 					"-input_file " + inputFile + " -output_model_conf_file " + outputModelConf +
 					" -output_model_weights_file " + outputModelWeights; // + "-output_stats_file " + outputStats;
 			runCommandLineSpark(command);
@@ -100,7 +103,7 @@ public class LearningManager {
 			String outputModelConf = "/local/BigData/Models/model" + task.getId() + " ";
 			String outputModelWeights = "/local/BigData/Models/weight" + task.getId() + " ";
 			//String outputStats = " ";
-			String command = sparkPath+" --class edu.jhu.bdslss.baft.BptiUsedSpark DL4JSparkJAR/MLAAS-1.0-SNAPSHOT.jar" +
+			String command = sparkPath+" --class edu.jhu.bdslss.baft.BptiUsedSpark DL4JSparkJAR/MLAAS-1.0-SNAPSHOT.jar " +
 					"-input_file " + inputFile + " -input_model_conf_file " + model.getModelPath() +
 					"  -input_model_weights_file " + model.getWeightPath() + " -output_model_conf_file " + outputModelConf +
 					" -output_model_weights_file " + outputModelWeights; // + "-output_stats_file " + outputStats;
@@ -120,7 +123,7 @@ public class LearningManager {
 		String inputFile = FeatureManager.formTestingData(job);
 		String outputStats = "/local/BigData/Results/stats"+job.getId()+".dat";
 		String sparkPath="/usr/local/Cellar/apache-spark/1.5.2/bin/spark-submit";
-		String command = sparkPath+" --class edu.jhu.bdslss.baft.BptiSparkTest DL4JSparkJAR/MLAAS-1.0-SNAPSHOT.jar" +
+		String command = sparkPath+" --class edu.jhu.bdslss.baft.BptiSparkTest DL4JSparkJAR/MLAAS-1.0-SNAPSHOT.jar " +
 				"-input_file " + inputFile + " -input_model_conf_file " + model.getModelPath() +
 				"  -input_model_weights_file " + model.getWeightPath() + " -output_stats_file " + outputStats;
 		runCommandLineSpark(command);
@@ -151,14 +154,14 @@ public class LearningManager {
 	private void runCommandLineSpark(String command){
 		Process p=null;
 		try {
+		  System.out.println(command);
+		  //command="ls -l";
 			p = Runtime.getRuntime().exec(command);
 			p.waitFor();
-			//System.out.println("Success");
-		}
-		catch(Exception e) {
 			BufferedReader b = new BufferedReader(new InputStreamReader(p.getInputStream()));
 			String line = "";
 			StringBuffer stringBuffer = new StringBuffer("");
+			//stringBuffer.append("Output stream of exec command");
 			try {
 				while ((line = b.readLine()) != null) {
 					stringBuffer.append(line);
@@ -166,6 +169,47 @@ public class LearningManager {
 				System.out.println( stringBuffer.toString());
 			}
 			catch(Exception e1){
+				System.out.println("Failed to write error in running Spark");
+			}
+			b = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+			line = "";
+			stringBuffer = new StringBuffer("");
+			stringBuffer.append("Output stream of exec command");
+			try {
+				while ((line = b.readLine()) != null) {
+					stringBuffer.append(line);
+				}
+				System.out.println( stringBuffer.toString());
+			}
+			catch(Exception e2){
+				System.out.println("Failed to write error in running Spark");
+			}
+		}
+		catch(Exception e) {
+			BufferedReader b = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			String line = "";
+			StringBuffer stringBuffer = new StringBuffer("");
+			//stringBuffer.append("Output stream of exec command");
+			try {
+				while ((line = b.readLine()) != null) {
+					stringBuffer.append(line);
+				}
+				System.out.println( stringBuffer.toString());
+			}
+			catch(Exception e1){
+				System.out.println("Failed to write error in running Spark");
+			}
+			b = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+			line = "";
+			stringBuffer = new StringBuffer("");
+			stringBuffer.append("Output stream of exec command");
+			try {
+				while ((line = b.readLine()) != null) {
+					stringBuffer.append(line);
+				}
+				System.out.println( stringBuffer.toString());
+			}
+			catch(Exception e2){
 				System.out.println("Failed to write error in running Spark");
 			}
 		}
