@@ -72,7 +72,7 @@ public class FeatureManager {
 	}
 	public static String formTestingData(Job job) {
 		// Empty for now...
-		String fileName = "pca_features4000.txt";
+		String fileName = "window_features4000.txt";
 
 		String outputFileName = "testFile"+job.getId()+".txt";
 		String dir = "/local/BigData/Data";
@@ -98,9 +98,9 @@ public class FeatureManager {
 			// Always wrap FileReader in BufferedReader.
 			BufferedReader bufferedReader =
 					new BufferedReader(fileReader);
-			for(int i = 0; i < 3200; ++i)
+			for(int i = 0; i < 60800; ++i)
 				bufferedReader.readLine();
-			for(int i = 3200; i<=3200+intPercent;i++)
+			for(int i = 60800; i<=60800+intPercent;i++)
 				toWrite.add(bufferedReader.readLine());
 			bufferedReader.close();
 			File file = new File(dir, outputFileName);

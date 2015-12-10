@@ -71,7 +71,9 @@ public class App {
 
     //Group Jobs Page -- will be removed later.
     get("/job_grouping", (request, response) -> {
+      long startTime = System.currentTimeMillis();
       app.groupJobs();
+      System.out.println(System.currentTimeMillis() - startTime);
       HashMap model = new HashMap();
       model.put("template", "templates/jobs_grouped.vtl");
       return new ModelAndView(model, layout);
