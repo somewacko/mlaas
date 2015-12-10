@@ -146,9 +146,9 @@ public class TaskPlanStats {
 	public static void main(String[] args) {
 
 		int numJobs = 100;
-		int numWork = 1000;
+		int numWork = 10000;
 
-		List<Double> variances = Arrays.asList(0.1, 1., 5., 10., 15., 20., 25., 35., 50., 75., 100.);
+		List<Double> variances = Arrays.asList(100.);
 
 		for (double variance : variances) {
 

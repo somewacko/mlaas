@@ -50,8 +50,6 @@ public class TaskPlan {
 	}
 
 
-	static int count = 0;
-
 	/**
 	 * Generates the logical plan based on the current tasks.
 	 * @param jobGroup The job group to create a task plan from.
@@ -80,7 +78,7 @@ public class TaskPlan {
 
 			for (Job job : task.getJobs()) {
 
-				remainingTasks.put(job, new LinkedList<Task>());
+				remainingTasks.put(job, new ArrayList<Task>(tasks.size()));
 
 				for (Task t : tasks)
 					if (t != startingTask && t.getJobs().contains(job))
@@ -96,10 +94,6 @@ public class TaskPlan {
 		for (TaskNode node : startingNodes) {
 			this.findPaths(node);
 		}
-
-
-
-		System.out.printf("(Num iterations: %d)\n", count);
 
 		// From the terminating tasks, bubble up the tree and color all tasks along the way to mark which ones are
 		// valid
@@ -133,11 +127,11 @@ public class TaskPlan {
 
 
 	/**
-	 *
+	 * Finds the paths that make up the task plan using best-first search with the distance from the end as our
+	 * heuristic.
+	 * @param node
 	 */
 	private void findPaths(TaskNode node) {
-
-		count += 1;
 
 		Task task = node.task;
 		Map<Job, List<Task>> remainingTasks = node.remainingTasks;
@@ -225,17 +219,51 @@ public class TaskPlan {
 
 			JobGroup jobsLeftGroup = new JobGroup(jobsLeft, jobGroup.getType());
 
-			Task task = this.findCommonTasks(jobsLeftGroup).get(0);
+			Collection<Job> relatedJobs = this.findMostRelatedJobs(jobsLeftGroup);
 
-			jobsLeft.removeAll(task.getJobs());
+			jobsLeft.removeAll(relatedJobs);
 
-			JobGroup subGroup = new JobGroup(task.getJobs(), jobGroup.getType());
+			JobGroup subGroup = new JobGroup(relatedJobs, jobGroup.getType());
 			List<Task> tasks = this.findCommonTasks(subGroup);
 			this.pruneTasks(tasks);
 			subGroups.add(tasks);
 		}
 
 		return subGroups;
+	}
+
+	/**
+	 * Finds the largest set of jobs which contain common work.
+	 * @param jobGroup
+	 */
+	private Collection<Job> findMostRelatedJobs(JobGroup jobGroup) {
+
+		List<Job> relatedJobs = new LinkedList<>();
+		List<Job> foundJobs = new LinkedList<>();
+
+		Set<DataUnit> allWork = jobGroup.allWork();
+
+		Map<Job, Set<DataUnit>> extractedWork = new HashMap<>();
+		for (Job job : jobGroup.getJobs())
+			extractedWork.put(job, jobGroup.extractWork(job));
+
+		// Go through each work present in the group
+		for (DataUnit work : allWork) {
+
+			foundJobs.clear();
+
+			// Find the jobs which have this work in common
+			for (Job job : jobGroup.getJobs())
+				if (extractedWork.get(job).contains(work))
+					foundJobs.add(job);
+
+			if (foundJobs.size() > relatedJobs.size()) {
+				relatedJobs = foundJobs;
+				foundJobs = new LinkedList<>();
+			}
+		}
+
+		return relatedJobs;
 	}
 
 
@@ -272,6 +300,10 @@ public class TaskPlan {
 
 		List<Job> relatedJobs = new LinkedList<>();
 
+		Map<Job, Set<DataUnit>> extractedWork = new HashMap<>();
+		for (Job job : jobGroup.getJobs())
+			extractedWork.put(job, jobGroup.extractWork(job));
+
 		// Go through each work present in the group
 		for (DataUnit work : allWork) {
 
@@ -279,7 +311,7 @@ public class TaskPlan {
 
 			// Find the jobs which have this work in common
 			for (Job job : jobGroup.getJobs()) {
-				if (jobGroup.extractWork(job).contains(work))
+				if (extractedWork.get(job).contains(work))
 					relatedJobs.add(job);
 			}
 
