@@ -70,7 +70,7 @@ public class LearningManager {
 				executeTask(nextTask, newModel);
 		}
 		else {
-			Results results = evaluateSparkModel(task.getEndJob(), model);
+			Results results = evaluateSparkModel(task.getEndJob(), newModel);
 			task.getEndJob().saveLearningResults(results);
 		}
 	}

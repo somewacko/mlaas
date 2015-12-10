@@ -35,11 +35,11 @@ public class FeatureManager {
 			samplesFromFile.add(((Samples) sampleList.get(i)).getSampleNumber());
 		}
 		String line = null;
-		String fileName = "pca_features4000.txt";
+		String fileName = "window_features4000.txt";
 		try {
-			FileReader fileReader = 
+			FileReader fileReader =
 					new FileReader(fileName);
-			BufferedReader bufferedReader = 
+			BufferedReader bufferedReader =
 					new BufferedReader(fileReader);
 			int counter = 0;
 			while((line = bufferedReader.readLine()) != null) {
@@ -47,7 +47,7 @@ public class FeatureManager {
 				if(samplesFromFile.contains(counter)){
 					toWrite.add(line);
 				}
-			} 
+			}
 			bufferedReader.close();
 			File file = new File(dir,outputFileName);
 			FileWriter fileWriter =
@@ -63,16 +63,16 @@ public class FeatureManager {
 			bufferedWriter.close();
 		}
 		catch(FileNotFoundException ex) {
-			ex.printStackTrace();                
+			ex.printStackTrace();
 		}
-		catch(IOException ex) {                  
+		catch(IOException ex) {
 			ex.printStackTrace();
 		}
 		return (dir+"/"+outputFileName);
 	}
 	public static String formTestingData(Job job) {
 		// Empty for now...
-		String fileName = "pca_features4000.txt";
+		String fileName = "window_features4000.txt";
 
 		String outputFileName = "testFile"+job.getId()+".txt";
 		String dir = "/local/BigData/Data";
@@ -92,15 +92,15 @@ public class FeatureManager {
 		int intPercent = (int)precent;
 		try {
 			// FileReader reads text files in the default encoding.
-			FileReader fileReader = 
+			FileReader fileReader =
 					new FileReader(fileName);
 
 			// Always wrap FileReader in BufferedReader.
-			BufferedReader bufferedReader = 
+			BufferedReader bufferedReader =
 					new BufferedReader(fileReader);
-			for(int i = 0; i < 3200; ++i)
+			for(int i = 0; i < 60800; ++i)
 				bufferedReader.readLine();
-			for(int i = 3200; i<=3200+intPercent;i++)
+			for(int i = 60800; i<=60800+intPercent;i++)
 				toWrite.add(bufferedReader.readLine());
 			bufferedReader.close();
 			File file = new File(dir, outputFileName);
@@ -122,10 +122,10 @@ public class FeatureManager {
 			bufferedWriter.close();
 		}
 		catch(FileNotFoundException ex) {
-			ex.printStackTrace();                 
+			ex.printStackTrace();
 		}
 		catch(IOException ex) {
-			ex.printStackTrace();                  
+			ex.printStackTrace();
 		}
 		return (dir+"/"+outputFileName);
 	}
