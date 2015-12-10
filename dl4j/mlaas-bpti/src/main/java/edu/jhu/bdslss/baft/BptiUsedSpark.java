@@ -162,8 +162,8 @@ public class BptiUsedSpark {
         registerOption("output_model_weights_file", "String", true, "The path to save the computed model weights to.");
         registerOption("input_model_weights_file", "String", true, "The path to load the previous model weights from.");
         //registerOption("output_stats_file", "String", true, "The path to save the model stats to.");
-        registerOption("num_samples", "Integer", true, "The number of samples to run on");
-        registerOption("num_features", "Integer", true, "The number of features to run on");
+        registerOption("num_samples", "String", true, "The number of samples to run on");
+        registerOption("num_features", "String", true, "The number of features to run on");
 
         // Other options will be added here.
     }
