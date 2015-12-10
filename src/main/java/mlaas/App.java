@@ -1,3 +1,4 @@
+package mlaas;
 import java.util.stream.IntStream;
 
 import mlaas.DataFeature;
