@@ -35,7 +35,7 @@ public class FeatureManager {
 			samplesFromFile.add(((Samples) sampleList.get(i)).getSampleNumber());
 		}
 		String line = null;
-		String fileName = "pca_features4000.txt";
+		String fileName = "window_features4000.txt";
 		try {
 			FileReader fileReader =
 					new FileReader(fileName);
