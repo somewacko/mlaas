@@ -64,6 +64,9 @@ abstract public class Task {
 		this.endJob = task.getEndJob();
 		this.lastTask = task.getLastTask();
 		this.nextTasks = new HashSet<>(task.getNextTasks());
+
+		this.id = Task.next_id;
+		Task.next_id += 1;
 	}
 
 	/**
