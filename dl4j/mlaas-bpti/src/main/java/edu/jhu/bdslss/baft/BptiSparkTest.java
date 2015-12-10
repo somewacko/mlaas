@@ -45,19 +45,21 @@ public class BptiSparkTest {
         //              -input_model_weights_file [input weights file] -output_model_conf_file [output conf file]
         //              -output_model_weights_file [output weights file] -output_stats_file [stats file]
         // Parse the command line.
-        String[] mandatory_args = { "input_file","input_model_conf_file","input_model_weights_file", "output_stats_file"};
+        String[] mandatory_args = { "input_file","num_samples","num_features","input_model_conf_file","input_model_weights_file", "output_stats_file"};
         createCommandLineOptions();
         CommandLineUtilities.initCommandLineParameters(args, BptiExample.options, mandatory_args);
 
         String inputFile = CommandLineUtilities.getOptionValue("input_file");
         String inputModelConf = CommandLineUtilities.getOptionValue("input_model_conf_file");
         String inputModelWeights = CommandLineUtilities.getOptionValue("input_model_weights_file");
+        int numSamples = CommandLineUtilities.getOptionValueAsInt("num_samples");
+        int numFeatures = CommandLineUtilities.getOptionValueAsInt("num_features");
         //String outputModelConf = CommandLineUtilities.getOptionValue("output_model_conf_file");
         //String outputModelWeights = CommandLineUtilities.getOptionValue("output_model_weights_file");
         String outputStats = CommandLineUtilities.getOptionValue("output_stats_file");
 
         Nd4j.ENFORCE_NUMERICAL_STABILITY = true;
-        final int numFeat = 15;//970;
+        //final int numFeat = 15;//970;
         int outputNum = 5;
 
         //int splitTrainNum = (int) (batchSize*.8);
@@ -83,7 +85,7 @@ public class BptiSparkTest {
         model.setListeners(Arrays.asList((IterationListener) new ScoreIterationListener(listenerFreq)));
 
         log.info("READING...");
-        DataSetIterator iter = new RecordReaderDataSetIterator(reader, 4000,numFeat,outputNum);
+        DataSetIterator iter = new RecordReaderDataSetIterator(reader, numSamples,numFeatures,outputNum);
         DataSet next = iter.next();
         next.normalizeZeroMeanZeroUnitVariance();
         //trainTest = next.splitTestAndTrain(0.7);
@@ -99,6 +101,8 @@ public class BptiSparkTest {
 
         INDArray predict2 = model.output(next.getFeatureMatrix());
         eval.eval(next.getLabels(), predict2);
+        log.info(eval.stats());
+
         String stats = eval.stats();
         log.info(stats);
         //Save stats to file
@@ -134,6 +138,8 @@ public class BptiSparkTest {
         //registerOption("output_model_weights_file", "String", true, "The path to save the computed model weights to.");
         registerOption("input_model_weights_file", "String", true, "The path to load the previous model weights from.");
         registerOption("output_stats_file", "String", true, "The path to save the model stats to.");
+        registerOption("num_samples", "String", true, "The number of samples to run on");
+        registerOption("num_features", "String", true, "The number of features to run on");
 
         // Other options will be added here.
     }

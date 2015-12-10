@@ -139,8 +139,10 @@ public class BptiExample {
         model.setListeners(Arrays.asList((IterationListener) new ScoreIterationListener(listenerFreq)));
 
         log.info("READING...");
-        DataSetIterator iter = new RecordReaderDataSetIterator(reader, 4000,78,5);
+        DataSetIterator iter = new RecordReaderDataSetIterator(reader, 5,78,5);
+        log.info(" bring from iterator");
         DataSet next = iter.next();
+        log.info("Done reading");
         next.normalizeZeroMeanZeroUnitVariance();
         log.info("Pre shuffle " + next.get(next.numExamples()-1));
         log.info("Pre shuffle " + next.get(0));

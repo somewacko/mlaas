@@ -56,9 +56,11 @@ public class BptiUsedExample {
         String outputModelConf = CommandLineUtilities.getOptionValue("output_model_conf_file");
         String outputModelWeights = CommandLineUtilities.getOptionValue("output_model_weights_file");
         //String outputStats = CommandLineUtilities.getOptionValue("output_stats_file");
+        int numSamples = CommandLineUtilities.getOptionValueAsInt("num_samples");
+        int numFeatures = CommandLineUtilities.getOptionValueAsInt("num_features");
 
         Nd4j.ENFORCE_NUMERICAL_STABILITY = true;
-        final int numFeat = 15;//970;
+        //final int numFeat = 15;//970;
         int outputNum = 5;
 
         //int splitTrainNum = (int) (batchSize*.8);
@@ -83,7 +85,7 @@ public class BptiUsedExample {
         model.setListeners(Arrays.asList((IterationListener) new ScoreIterationListener(listenerFreq)));
 
         log.info("READING...");
-        DataSetIterator iter = new RecordReaderDataSetIterator(reader, 4000,numFeat,outputNum);
+        DataSetIterator iter = new RecordReaderDataSetIterator(reader, numSamples,numFeatures,outputNum);
         DataSet next = iter.next();
         next.normalizeZeroMeanZeroUnitVariance();
         /////log.info("check iterate function: "+ trainTest.getTrain().iterateWithMiniBatches().totalExamples());
@@ -145,6 +147,8 @@ public class BptiUsedExample {
         registerOption("output_model_weights_file", "String", true, "The path to save the computed model weights to.");
         registerOption("input_model_weights_file", "String", true, "The path to load the previous model weights from.");
         //registerOption("output_stats_file", "String", true, "The path to save the model stats to.");
+        registerOption("num_samples", "String", true, "The number of samples to run on");
+        registerOption("num_features", "String", true, "The number of features to run on");
 
         // Other options will be added here.
     }

@@ -70,6 +70,8 @@ public class BptiSparkTrain {
 
         String outputModelConf = CommandLineUtilities.getOptionValue("output_model_conf_file");
         if(StringUtils.isBlank(outputModelConf)) throw new Exception("Please specify model config output file");
+        int numSamples = CommandLineUtilities.getOptionValueAsInt("num_samples");
+        int numFeatures = CommandLineUtilities.getOptionValueAsInt("num_features");
 
         String outputModelWeights = CommandLineUtilities.getOptionValue("output_model_weights_file");
         if(StringUtils.isBlank(outputModelWeights)) throw new Exception("Please specify model weights output file");
@@ -78,13 +80,13 @@ public class BptiSparkTrain {
         if(StringUtils.isBlank(outputStats)) throw new Exception("Please specify stats output file");*/
 
         Nd4j.ENFORCE_NUMERICAL_STABILITY = true;
-        final int numFeat = 15;    //15;
+        //final int numFeat = 15;    //15;
         int outputNum = 5;
-        int numSamples = 4000;
+        //int numSamples = 4000;
         int iterations = 40;
         int seed = 123;
         int listenerFreq = iterations/25;
-        int batchSize = 2000; //10; //need at least this much batch size for learning
+        int batchSize = numSamples/2; //10; //need at least this much batch size for learning
 
         //Load data..
         RecordReader reader = new CSVRecordReader(0, ",");
@@ -102,7 +104,7 @@ public class BptiSparkTrain {
                 //.l1(0.3).regularization(false).l2(1e-3)
                 .constrainGradientToUnitNorm(true).optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
                 .list(5)
-                .layer(0, new DenseLayer.Builder().nIn(numFeat).nOut(100)
+                .layer(0, new DenseLayer.Builder().nIn(numFeatures).nOut(100)
                         .activation(activation).dropOut(0.5)
                         .weightInit(WeightInit.XAVIER)
                         .build())
@@ -131,7 +133,7 @@ public class BptiSparkTrain {
 
         System.out.println("Initializing network");
 
-        DataSetIterator iter = new RecordReaderDataSetIterator(reader, numSamples,numFeat,outputNum);
+        DataSetIterator iter = new RecordReaderDataSetIterator(reader, numSamples,numFeatures,outputNum);
         DataSet next = iter.next();
         //next.normalizeZeroMeanZeroUnitVariance();
         //next.shuffle();
@@ -192,6 +194,8 @@ public class BptiSparkTrain {
         registerOption("output_model_conf_file", "String", true, "The path to save the computed model conf to.");
         registerOption("output_model_weights_file", "String", true, "The path to save the computed model weights to.");
         //registerOption("output_stats_file", "String", true, "The path to save the model stats to.");
+        registerOption("num_samples", "String", true, "The number of samples to run on");
+        registerOption("num_features", "String", true, "The number of features to run on");
 
         // Other options will be added here.
     }
