@@ -10,3 +10,6 @@
 .idea
 target/
 
+# Large JAR
+DL4JSparkJAR/
+

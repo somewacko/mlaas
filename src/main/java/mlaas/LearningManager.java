@@ -85,6 +85,7 @@ public class LearningManager {
 
 		String inputFile = FeatureManager.formTrainingData(task);
 		String sparkPath="/usr/local/Cellar/apache-spark/1.5.2/bin/spark-submit";
+		int numSamples = task.getSamples().size();
 		if(model == null  || model.isEmpty()){
 			//train new model
 			//String inputFile = "/local/BigData/Data/inputFile"+task.getId()+".txt ";
@@ -92,7 +93,7 @@ public class LearningManager {
 			String outputModelWeights = "/local/BigData/Models/weight"+task.getId()+" ";
 			//String outputStats = " ";
 			String command=sparkPath+" --class edu.jhu.bdslss.baft.BptiSparkTrain DL4JSparkJAR/MLAAS-1.0-SNAPSHOT.jar " +
-					"-input_file " + inputFile + " -output_model_conf_file " + outputModelConf +
+					"-num_samples " + numSamples + " -input_file " + inputFile + " -output_model_conf_file " + outputModelConf +
 					" -output_model_weights_file " + outputModelWeights; // + "-output_stats_file " + outputStats;
 			runCommandLineSpark(command);
 			return new DNNModel(outputModelConf,outputModelWeights);
@@ -104,7 +105,7 @@ public class LearningManager {
 			String outputModelWeights = "/local/BigData/Models/weight" + task.getId() + " ";
 			//String outputStats = " ";
 			String command = sparkPath+" --class edu.jhu.bdslss.baft.BptiUsedSpark DL4JSparkJAR/MLAAS-1.0-SNAPSHOT.jar " +
-					"-input_file " + inputFile + " -input_model_conf_file " + model.getModelPath() +
+					"-num_samples " + numSamples + "-input_file " + inputFile + " -input_model_conf_file " + model.getModelPath() +
 					"  -input_model_weights_file " + model.getWeightPath() + " -output_model_conf_file " + outputModelConf +
 					" -output_model_weights_file " + outputModelWeights; // + "-output_stats_file " + outputStats;
 			runCommandLineSpark(command);
@@ -123,8 +124,9 @@ public class LearningManager {
 		String inputFile = FeatureManager.formTestingData(job);
 		String outputStats = "/local/BigData/Results/stats"+job.getId()+".dat";
 		String sparkPath="/usr/local/Cellar/apache-spark/1.5.2/bin/spark-submit";
+		int numSamples = task.getSamples().size();
 		String command = sparkPath+" --class edu.jhu.bdslss.baft.BptiSparkTest DL4JSparkJAR/MLAAS-1.0-SNAPSHOT.jar " +
-				"-input_file " + inputFile + " -input_model_conf_file " + model.getModelPath() +
+				"-num_samples " + numSamples + "-input_file " + inputFile + " -input_model_conf_file " + model.getModelPath() +
 				"  -input_model_weights_file " + model.getWeightPath() + " -output_stats_file " + outputStats;
 		runCommandLineSpark(command);
 		Results result = new Results();
