@@ -94,7 +94,7 @@ public class LearningManager {
 			String outputModelWeights = "/local/BigData/Models/weight"+task.getId()+" ";
 			//String outputStats = " ";
 			String command=sparkPath+" --class edu.jhu.bdslss.baft.BptiSparkTrain DL4JSparkJAR/MLAAS-1.0-SNAPSHOT.jar " +
-					"-num_samples " + numSamples + "-num_features " + numFeatures +
+					"-num_samples " + numSamples + " -num_features " + numFeatures +
 					" -input_file " + inputFile + " -output_model_conf_file " + outputModelConf +
 					" -output_model_weights_file " + outputModelWeights; // + "-output_stats_file " + outputStats;
 			runCommandLineSpark(command);
@@ -107,8 +107,8 @@ public class LearningManager {
 			String outputModelWeights = "/local/BigData/Models/weight" + task.getId() + " ";
 			//String outputStats = " ";
 			String command = sparkPath+" --class edu.jhu.bdslss.baft.BptiUsedSpark DL4JSparkJAR/MLAAS-1.0-SNAPSHOT.jar " +
-					"-num_samples " + numSamples + "-num_features " + numFeatures +
-					"-input_file " + inputFile + " -input_model_conf_file " + model.getModelPath() +
+					"-num_samples " + numSamples + " -num_features " + numFeatures +
+					" -input_file " + inputFile + " -input_model_conf_file " + model.getModelPath() +
 					"  -input_model_weights_file " + model.getWeightPath() + " -output_model_conf_file " + outputModelConf +
 					" -output_model_weights_file " + outputModelWeights; // + "-output_stats_file " + outputStats;
 			runCommandLineSpark(command);
@@ -130,7 +130,7 @@ public class LearningManager {
 		int numSamples = job.getSamples().size();
 		int numFeatures = job.getFeatures().size();
 		String command = sparkPath+" --class edu.jhu.bdslss.baft.BptiSparkTest DL4JSparkJAR/MLAAS-1.0-SNAPSHOT.jar " +
-				"-num_samples " + numSamples + "-num_features " + numFeatures +
+				"-num_samples " + numSamples + " -num_features " + numFeatures +
 				" -input_file " + inputFile + " -input_model_conf_file " + model.getModelPath() +
 				"  -input_model_weights_file " + model.getWeightPath() + " -output_stats_file " + outputStats;
 		runCommandLineSpark(command);
@@ -148,9 +148,10 @@ public class LearningManager {
 		String line="";
 		try {
 			while ((line = b.readLine()) != null) {
-				stringBuffer.append(line);
+				stringBuffer.append(line+"\n");
 			}
 			result.stats = stringBuffer.toString();
+			System.out.println(result.stats);
 		}
 		catch(Exception e){
 			System.out.println("Error in reading results");
@@ -171,7 +172,7 @@ public class LearningManager {
 			//stringBuffer.append("Output stream of exec command");
 			try {
 				while ((line = b.readLine()) != null) {
-					stringBuffer.append(line);
+					stringBuffer.append(line+"\n");
 				}
 				System.out.println( stringBuffer.toString());
 			}
@@ -184,7 +185,7 @@ public class LearningManager {
 			stringBuffer.append("Output stream of exec command");
 			try {
 				while ((line = b.readLine()) != null) {
-					stringBuffer.append(line);
+					stringBuffer.append(line+"\n");
 				}
 				System.out.println( stringBuffer.toString());
 			}
@@ -212,7 +213,7 @@ public class LearningManager {
 			stringBuffer.append("Output stream of exec command");
 			try {
 				while ((line = b.readLine()) != null) {
-					stringBuffer.append(line);
+					stringBuffer.append(line+"\n");
 				}
 				System.out.println( stringBuffer.toString());
 			}
