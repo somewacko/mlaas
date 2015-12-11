@@ -138,6 +138,7 @@ public class TaskPlanStats {
 
 		JobGroup jobGroup = new JobGroup(jobs, JobGroupType.SharedSamples);
 		TaskPlan taskPlan = new TaskPlan(jobGroup);
+		System.out.println("FINISHED CREATING TASK PLAN");
 
 		return new Stats(taskPlan, jobGroup);
 	}
@@ -145,10 +146,10 @@ public class TaskPlanStats {
 
 	public static void main(String[] args) {
 
-		int numJobs = 100;
-		int numWork = 10000;
+		int numJobs = 2;
+		int numWork = 100000;
 
-		List<Double> variances = Arrays.asList(100.);
+		List<Double> variances = Arrays.asList(1000.);
 
 		for (double variance : variances) {
 

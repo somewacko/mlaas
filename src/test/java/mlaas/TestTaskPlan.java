@@ -447,8 +447,8 @@ public class TestTaskPlan {
 	public void testLargeGroup() {
 
 		final int numJobs = 20;
-		final int numWork = 1000;
-		final double variance = 50;
+		final int numWork = 500;
+		final double variance = 10;
 
 		final Random rand = new Random();
 

@@ -212,7 +212,6 @@ public class TaskPlan {
 
 		List<List<Task>> subGroups = new ArrayList<>();
 
-
 		List<Job> jobsLeft = new ArrayList<>(jobGroup.getJobs());
 
 		while (!jobsLeft.isEmpty()) {
@@ -305,6 +304,9 @@ public class TaskPlan {
 			extractedWork.put(job, jobGroup.extractWork(job));
 
 		// Go through each work present in the group
+
+		HashMap<String, Task> hashedTasks = new HashMap<>();
+
 		for (DataUnit work : allWork) {
 
 			relatedJobs.clear();
@@ -317,9 +319,22 @@ public class TaskPlan {
 
 			// Add this job group if there are more than one jobs associated with it (tasks with only one job will
 			// be added later)
-			if (relatedJobs.size() > 1)
-				tasks.add( TaskFactory.createTask(relatedJobs, jobGroup.getType()) );
+			if (relatedJobs.size() > 1) {
+
+				// Hash combinations of jobs
+				String hash = "";
+				for (Job job : relatedJobs)
+					hash += Integer.toString(job.getId());
+
+				if (hashedTasks.get(hash) == null)
+					hashedTasks.put(hash, TaskFactory.createTask(relatedJobs, jobGroup.getType()));
+				else
+					hashedTasks.get(hash).getWork().add(work);
+			}
 		}
+		for (Task task : hashedTasks.values())
+			tasks.add(task);
+
 		// Add tasks which only have one job associated with them
 		for (Job job : jobGroup.getJobs()) {
 			tasks.add( TaskFactory.createTask(Arrays.asList(job), jobGroup.getType()) );
@@ -337,7 +352,6 @@ public class TaskPlan {
 					return 0;
 			}
 		});
-
 
 		return tasks;
 	}
