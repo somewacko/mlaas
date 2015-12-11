@@ -18,4 +18,6 @@ DL4JSparkJAR/
 build/
 data/
 data/features/
+mid_features4000.txt
+mid_noh_features4000.txt
 window_features4000.txt
