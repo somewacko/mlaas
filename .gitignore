@@ -21,3 +21,5 @@ data/features/
 mid_features4000.txt
 mid_noh_features4000.txt
 window_features4000.txt
+pca_window40_features4000.txt
+window_noh_features4000.txt

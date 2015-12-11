@@ -127,7 +127,7 @@ public class LearningManager {
 		String inputFile = FeatureManager.formTestingData(job);
 		String outputStats = "/local/BigData/Results/stats"+job.getId()+".dat";
 		String sparkPath="/usr/local/Cellar/apache-spark/1.5.2/bin/spark-submit";
-		int numSamples = job.getSamples().size();
+		int numSamples = FeatureManager.getNumTest(job);//job.getSamples().size();
 		int numFeatures = job.getFeatures().size();
 		String command = sparkPath+" --class edu.jhu.bdslss.baft.BptiSparkTest DL4JSparkJAR/MLAAS-1.0-SNAPSHOT.jar " +
 				"-num_samples " + numSamples + " -num_features " + numFeatures +

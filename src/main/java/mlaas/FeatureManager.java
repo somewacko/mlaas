@@ -35,7 +35,7 @@ public class FeatureManager {
 			samplesFromFile.add(((Samples) sampleList.get(i)).getSampleNumber());
 		}
 		String line = null;
-		String fileName = "window_features4000.txt";
+		String fileName = "window_noh_features4000.txt";
 		try {
 			FileReader fileReader =
 					new FileReader(fileName);
@@ -72,7 +72,7 @@ public class FeatureManager {
 	}
 	public static String formTestingData(Job job) {
 		// Empty for now...
-		String fileName = "window_features4000.txt";
+		String fileName = "window_noh_features4000.txt";
 
 		String outputFileName = "testFile"+job.getId()+".txt";
 		String dir = "/local/BigData/Data";
@@ -88,7 +88,7 @@ public class FeatureManager {
 		{
 			samplesFromFile.add(((Samples) sampleList.get(i)).getSampleNumber());
 		}
-		double precent = (samplesFromFile.size()*.25);
+		double precent = (job.getSamples().size()*.25);
 		int intPercent = (int)precent;
 		try {
 			// FileReader reads text files in the default encoding.
@@ -98,7 +98,7 @@ public class FeatureManager {
 			// Always wrap FileReader in BufferedReader.
 			BufferedReader bufferedReader =
 					new BufferedReader(fileReader);
-			for(int i = 0; i < 60800; ++i)
+			for(int i = 0; i < 60800; ++i)//60800 //3200
 				bufferedReader.readLine();
 			for(int i = 60800; i<=60800+intPercent;i++)
 				toWrite.add(bufferedReader.readLine());
@@ -129,4 +129,10 @@ public class FeatureManager {
 		}
 		return (dir+"/"+outputFileName);
 	}
+	public static int getNumTest(Job job) {
+		int samplesNum = job.getSamples().size();
+		int num = (int) ((samplesNum) * (.25));
+		return num;
+	}
+
 }
