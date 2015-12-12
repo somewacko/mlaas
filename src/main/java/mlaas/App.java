@@ -79,7 +79,7 @@ public class App {
       model.put("template", "templates/jobs_grouped.vtl");
       return new ModelAndView(model, layout);
     }, new VelocityTemplateEngine());
-    app.timer.schedule (app.hourlyTask, 0l, cronTime);
+  //  app.timer.schedule (app.hourlyTask, 0l, cronTime);
   }
 
 
