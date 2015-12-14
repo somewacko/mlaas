@@ -1,11 +1,14 @@
 #!/usr/bin/env python
 import os
-path = '../data/features/'  # remove the trailing '\'
-avg_features=[]
+path = '/mddb2/backup/projects/bpti_db/features/'  # remove the trailing '\'
+avg_features={}
 for dir_entry in os.listdir(path):
     dir_entry_path = os.path.join(path, dir_entry)
     if os.path.isfile(dir_entry_path):
 	with open(dir_entry_path,'r') as f:
+		file_number = dir_entry.split('_')[1].split('.')[0]
+		print file_number
+		file_number=int(file_number)
 		line = f.readline()
 		fv=line.strip().split('{')
 		#because 1001 parts, first is just '['
@@ -30,24 +33,25 @@ for dir_entry in os.listdir(path):
 		for k in avg_feat.keys():
 			avg_feat[k]=[x/(float(len(fv_dict))) for x in avg_feat[k]]
 		#print avg_feat
-		print dir_entry_path 
-		avg_features.append(avg_feat)
+		#print dir_entry_path 
+		avg_features[file_number]=avg_feat
 		f.close()
 #dump to file in csv format
 #chi1,chi2,hbonds,rms,state
 #1 FV per line
-f = open('../data/avg_features'+str(len(avg_features))+'.txt','w')
-states= open('../data/states.txt','r')
-for each in avg_features:
+f = open('../new_files/avg_features'+str(len(avg_features))+'.txt','w')
+state_file= open('../data/states.txt','r')
+for i, state in enumerate(state_file.readlines()[:4000]):
+	#for each in avg_features:
 	fv=''
 	#can choose key inputs here 
 	#if only subset of features are required
-	for v in each.values():
+	for v in avg_features[i].values():
 		for val in v:
 			fv=fv+str(val)+','
-	fv=fv+states.readline().strip().split()[1]
+	fv=fv+state.strip().split()[1]
 	fv=fv+'\n'
 	f.write(fv)
 f.close()
-states.close()
+state_file.close()
 print len(avg_features)
